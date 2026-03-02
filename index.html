@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>カウンセリング管理表</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --s0-bg: #ffffff;  --s0-bd: #d1d5db;
+  --s1-bg: #ffe4ec;  --s1-bd: #f472a0;  --s1-tx: #9b1a4a;
+  --s2-bg: #fef9c3;  --s2-bd: #f59e0b;  --s2-tx: #78350f;
+  --s3-bg: #e5e7eb;  --s3-bd: #9ca3af;  --s3-tx: #6b7280;
+  --cw: 148px;
+  --ch: 76px;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #0f172a;
+  color: #111827;
+  overflow: hidden;
+}
+
+body { display: flex; flex-direction: column; }
+
+/* ─── TOPBAR ─── */
+#topbar {
+  flex-shrink: 0;
+  height: 50px;
+  background: #0f172a;
+  border-bottom: 1px solid #1e3a5f;
+  display: flex; align-items: center;
+  padding: 0 14px; gap: 10px;
+}
+#topbar h1 { color: #f1f5f9; font-size: .92rem; font-weight: 700; white-space: nowrap; }
+
+.stats { display: flex; gap: 7px; }
+.pill {
+  padding: 3px 9px; border-radius: 20px;
+  font-size: .7rem; font-weight: 700; white-space: nowrap;
+  display: flex; align-items: center; gap: 4px;
+}
+.pill b { font-size: .85rem; }
+.p1 { background: #ffe4ec; color: #9b1a4a; }
+.p2 { background: #fef9c3; color: #78350f; }
+.p3 { background: #e5e7eb; color: #4b5563; }
+
+#btnReset {
+  margin-left: auto;
+  background: #dc2626; color: #fff; border: none; border-radius: 8px;
+  padding: 8px 13px; font-size: .78rem; font-weight: 700; font-family: inherit;
+  cursor: pointer; touch-action: manipulation; white-space: nowrap;
+}
+
+/* ─── TABS ─── */
+#tabs {
+  flex-shrink: 0; height: 44px;
+  display: flex; background: #0f172a;
+  border-bottom: 2px solid #1e3a5f;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+#tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 0 22px; height: 100%;
+  display: flex; align-items: center;
+  color: #64748b; font-size: .85rem; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  border-bottom: 3px solid transparent; margin-bottom: -2px;
+  touch-action: manipulation;
+}
+.tab.on { color: #38bdf8; border-bottom-color: #38bdf8; }
+
+/* ─── LEGEND ─── */
+#legend {
+  flex-shrink: 0; height: 36px;
+  background: #1e293b; border-bottom: 1px solid #334155;
+  display: flex; align-items: center;
+  padding: 0 14px; gap: 14px; overflow-x: auto;
+}
+#legend::-webkit-scrollbar { display: none; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: .68rem; color: #94a3b8; white-space: nowrap; }
+.sw { width: 13px; height: 13px; border-radius: 3px; border: 1.5px solid; flex-shrink: 0; }
+.sw0 { background: #fff; border-color: #d1d5db; }
+.sw1 { background: #ffe4ec; border-color: #f472a0; }
+.sw2 { background: #fef9c3; border-color: #f59e0b; }
+.sw3 { background: #e5e7eb; border-color: #9ca3af; }
+.leghint { margin-left: auto; font-size: .62rem; color: #475569; white-space: nowrap; }
+
+/* ─── SCROLL ─── */
+#scroller {
+  flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: 10px;
+}
+
+/* ─── SECTION ─── */
+.sec { display: none; }
+.sec.on { display: block; }
+
+/* ─── TABLE ─── */
+table.grid { border-collapse: separate; border-spacing: 4px; }
+
+.th-corner { min-width: 52px; width: 52px; }
+
+.th-time {
+  min-width: var(--cw); width: var(--cw); height: 42px;
+  background: #1e3a5f; color: #93c5fd;
+  font-size: .68rem; font-weight: 700;
+  text-align: center; vertical-align: middle;
+  border-radius: 6px; white-space: nowrap; padding: 3px;
+}
+
+.th-row {
+  min-width: 52px; width: 52px; height: var(--ch);
+  background: #1e3a5f; color: #93c5fd;
+  font-size: .75rem; font-weight: 700;
+  text-align: center; vertical-align: middle;
+  border-radius: 6px;
+}
+
+.td { min-width: var(--cw); width: var(--cw); height: var(--ch); vertical-align: top; padding: 0; }
+
+/* ─── CARD ─── */
+.card {
+  width: 100%; height: 100%; min-height: var(--ch);
+  border: 2px solid var(--s0-bd);
+  border-radius: 8px; background: var(--s0-bg);
+  display: flex; align-items: stretch; overflow: hidden;
+  position: relative; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: border-color .15s, background .15s;
+  user-select: none;
+}
+.card:active { transform: scale(.96); transition: transform .05s; }
+
+.card.empty {
+  border-style: dashed; border-color: #374151;
+  background: rgba(255,255,255,.04);
+  justify-content: center; align-items: center;
+  color: #4b5563; font-size: 1.2rem;
+}
+
+.card[data-s="1"] { background: var(--s1-bg); border-color: var(--s1-bd); box-shadow: 0 0 0 2px rgba(244,114,160,.2); }
+.card[data-s="2"] { background: var(--s2-bg); border-color: var(--s2-bd); animation: gp 1.8s ease-in-out infinite; }
+.card[data-s="3"] { background: var(--s3-bg); border-color: var(--s3-bd); opacity: .65; }
+
+@keyframes gp {
+  0%,100% { box-shadow: 0 0 4px 2px rgba(245,158,11,.25); }
+  50%      { box-shadow: 0 0 16px 5px rgba(245,158,11,.6); }
+}
+
+.c-num {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; min-width: 36px;
+  background: rgba(0,0,0,.04); border-right: 1px solid rgba(0,0,0,.06);
+  font-size: .78rem; font-weight: 700; color: #1d4ed8;
+  text-align: center; word-break: break-all; padding: 2px; line-height: 1.2;
+}
+.card[data-s="1"] .c-num { color: var(--s1-tx); }
+.card[data-s="2"] .c-num { color: var(--s2-tx); }
+.card[data-s="3"] .c-num { color: var(--s3-tx); }
+
+.c-body {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  padding: 5px 7px; gap: 3px; overflow: hidden; min-width: 0;
+}
+.c-name {
+  font-size: .84rem; font-weight: 700; color: #111827;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3;
+}
+.c-staff {
+  font-size: .65rem; color: #6b7280;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card[data-s="1"] .c-name, .card[data-s="1"] .c-staff { color: var(--s1-tx); }
+.card[data-s="2"] .c-name, .card[data-s="2"] .c-staff { color: var(--s2-tx); }
+.card[data-s="3"] .c-name, .card[data-s="3"] .c-staff { color: var(--s3-tx); }
+
+.c-dot {
+  position: absolute; top: 5px; right: 5px;
+  width: 7px; height: 7px; border-radius: 50%; display: none;
+}
+.card[data-s="1"] .c-dot { display: block; background: #f43f5e; }
+.card[data-s="2"] .c-dot { display: block; background: #eab308; box-shadow: 0 0 4px #eab308; }
+.card[data-s="3"] .c-dot { display: block; background: #9ca3af; }
+
+/* ─── MODAL ─── */
+#overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.65);
+  z-index: 999; justify-content: center; align-items: center; padding: 16px;
+}
+#overlay.on { display: flex; }
+.modal {
+  background: #fff; border-radius: 18px; padding: 22px;
+  width: 100%; max-width: 360px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.5);
+}
+.modal h3 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: #111827; }
+.mf { margin-bottom: 12px; }
+.ml { font-size: .72rem; color: #6b7280; font-weight: 600; margin-bottom: 5px; display: block; }
+.mi {
+  width: 100%; padding: 13px 14px;
+  border: 2px solid #e5e7eb; border-radius: 10px;
+  font-family: inherit; font-size: 1rem; color: #111827; outline: none;
+  -webkit-appearance: none;
+}
+.mi:focus { border-color: #3b82f6; }
+.sbg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+.sb {
+  padding: 12px 6px; border: 2px solid #e5e7eb; border-radius: 9px;
+  background: #f9fafb; font-family: inherit; font-size: .75rem; font-weight: 600;
+  color: #6b7280; cursor: pointer; touch-action: manipulation; text-align: center;
+}
+.sb.on[data-s="0"] { border-color: #9ca3af; background: #f3f4f6; color: #374151; }
+.sb.on[data-s="1"] { border-color: var(--s1-bd); background: var(--s1-bg); color: var(--s1-tx); }
+.sb.on[data-s="2"] { border-color: var(--s2-bd); background: var(--s2-bg); color: var(--s2-tx); }
+.sb.on[data-s="3"] { border-color: var(--s3-bd); background: var(--s3-bg); color: var(--s3-tx); }
+.ma { display: flex; gap: 10px; margin-top: 18px; }
+.mbtn {
+  padding: 14px; border: none; border-radius: 10px;
+  font-family: inherit; font-size: .9rem; font-weight: 700;
+  cursor: pointer; touch-action: manipulation;
+}
+.mbtn.cancel { background: #f1f5f9; color: #475569; flex: 0 0 80px; }
+.mbtn.save   { background: #2563eb; color: #fff; flex: 1; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <h1>📋 カウンセリング管理表</h1>
+  <div class="stats">
+    <div class="pill p1">①来校 <b id="s1">0</b></div>
+    <div class="pill p2">②中 <b id="s2">0</b></div>
+    <div class="pill p3">③終了 <b id="s3">0</b></div>
+  </div>
+  <button id="btnReset" onclick="confirmReset()">全リセット</button>
+</div>
+
+<div id="tabs"></div>
+
+<div id="legend">
+  <div class="leg"><div class="sw sw0"></div>⓪ 未来校</div>
+  <div class="leg"><div class="sw sw1"></div>① 来校</div>
+  <div class="leg"><div class="sw sw2"></div>② カウンセリング中</div>
+  <div class="leg"><div class="sw sw3"></div>③ 終了</div>
+  <div class="leghint">タップ→状態変更　長押し→編集</div>
+</div>
+
+<div id="scroller"><div id="sections"></div></div>
+
+<div id="overlay">
+  <div class="modal">
+    <h3>✏️ カード情報を編集</h3>
+    <div class="mf">
+      <label class="ml">番号</label>
+      <input class="mi" id="mNum" type="text" inputmode="numeric" placeholder="例: 308">
+    </div>
+    <div class="mf">
+      <label class="ml">氏名</label>
+      <input class="mi" id="mName" type="text" placeholder="例: 落合 夏実">
+    </div>
+    <div class="mf">
+      <label class="ml">担当講師</label>
+      <input class="mi" id="mStaff" type="text" placeholder="例: 長広">
+    </div>
+    <div class="mf">
+      <label class="ml">状態</label>
+      <div class="sbg">
+        <button class="sb" data-s="0" onclick="pickState(0)">⓪ 未来校</button>
+        <button class="sb" data-s="1" onclick="pickState(1)">① 来校</button>
+        <button class="sb" data-s="2" onclick="pickState(2)">② カウンセリング中</button>
+        <button class="sb" data-s="3" onclick="pickState(3)">③ 終了</button>
+      </div>
+    </div>
+    <div class="ma">
+      <button class="mbtn cancel" onclick="closeModal()">戻る</button>
+      <button class="mbtn save" onclick="saveModal()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  完全データ (Excelから正確に取得)
+//  各行: [番号, 氏名, 担当] または null(空セル)
+//  列順: 19:00, 19:15, 19:30, 19:45, 20:00, 20:15, 20:30, 20:45
+// ============================================================
+
+const SLOTS = ["19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45"];
+
+const DATES = [
+  {
+    label: "3/2（月）",
+    rows: [
+      {
+        label: "戸祭",
+        cells: [
+          [308,"落合 夏実","長広"],
+          [327,"檜垣 初音","町田"],
+          [129,"乙野 圭史","長広"],
+          [152,"門野 美希","澤中"],
+          [234,"荒木 洸人","川﨑"],
+          [235,"篠木 愛海","川﨑"],
+          [232,"髙橋 奈緒","遠藤(洋)"],
+          [322,"兎澤 胡桃","奥田"],
+        ]
+      },
+      {
+        label: "田中",
+        cells: [
+          [312,"古木 美有","澤中"],
+          [302,"香月 元気","遠藤(真)"],
+          [113,"知名 定彦","長広"],
+          [161,"蓮 勇貴","長広"],
+          [246,"大髙 匠海","石田"],
+          [156,"田島 栞","石田"],
+          [230,"池澤 友真","堀口"],
+          [132,"和田 優希","長広"],
+        ]
+      },
+      {
+        label: "小杉",
+        cells: [
+          [325,"下山 雅人","町田"],
+          [128,"佐藤 果澄","長広"],
+          [138,"岡嶋 翔太","長広"],
+          [127,"後藤 空也","長広"],
+          [242,"横尾 允徳","堀口"],
+          [139,"山川 夏輝","澤中"],
+          [201,"呉 昭彦","堀口"],
+          [133,"和田 勇人","長広"],
+        ]
+      },
+    ]
+  },
+  {
+    label: "3/3（火）",
+    rows: [
+      {
+        label: "田村",
+        cells: [
+          [410,"西崎 里美","奥田"],
+          [306,"村上 礼治","石田"],
+          [411,"吉川 千尋","長広"],
+          [318,"井口 豪","奥田"],
+          [104,"中島 ことな","遠藤(真)"],
+          [330,"佐藤 啓春","川﨑"],
+          [143,"真壁 智生","澤中"],
+          [147,"藤江 桜良","澤中"],
+        ]
+      },
+      {
+        label: "後藤",
+        cells: [
+          [333,"辻 和也","遠藤(真)"],
+          [310,"李沢 達弥","澤中"],
+          [303,"小林 澪生","遠藤(真)"],
+          [162,"佐古 大樹","遠藤(真)"],
+          [229,"白倉 海翔","堀口"],
+          [238,"西田 龍生","遠藤(真)"],
+          [136,"小向井 紫帆","長広"],
+          [130,"河野辺 悠仁","長広"],
+        ]
+      },
+      {
+        label: "戸祭",
+        cells: [
+          [151,"土田 ののか","長広"],
+          [102,"石田 章人","遠藤(真)"],
+          [313,"田中 瑞季","澤中"],
+          [118,"伊藤 朱里","長広"],
+          [206,"清水 愛和","石田"],
+          [241,"黒澤 一樹","遠藤(真)"],
+          [135,"池崎 夢菜","長広"],
+          null,
+        ]
+      },
+    ]
+  },
+  {
+    label: "3/4（水）",
+    rows: [
+      {
+        label: "戸祭",
+        cells: [
+          [305,"渡邊 萌生香","遠藤(真)"],
+          [331,"石橋 美智子","川﨑"],
+          [316,"根岸 真子","澤中"],
+          [304,"佐藤 琢磨","遠藤(真)"],
+          [403,"初見 拓哉","木谷"],
+          [324,"那音 太","奥田"],
+          [203,"山田 周平","川﨑"],
+          [332,"渡邉 健太郎","石田"],
+        ]
+      },
+      {
+        label: "後藤",
+        cells: [
+          [101,"呉 理恵","遠藤(真)"],
+          [204,"江草 紘明","遠藤(洋)"],
+          [404,"大村 英人","長広"],
+          [408,"松本 綾子","澤中"],
+          null,
+          null,
+          [110,"五十嵐 美紗","遠藤(真)"],
+          [320,"小川 千明","澤中"],
+        ]
+      },
+      {
+        label: "小杉",
+        cells: [
+          [144,"藤村 知紀","澤中"],
+          [406,"井浦 克裕","長広"],
+          [119,"粟原 将仁","長広"],
+          [328,"久恒 友海","堀口"],
+          null,
+          null,
+          [323,"大森 聡","奥田"],
+          [315,"岩本 祥馬","澤中"],
+        ]
+      },
+    ]
+  },
+  {
+    label: "3/5（木）",
+    rows: [
+      {
+        label: "田村",
+        cells: [
+          [401,"中西 洋平","遠藤(真)"],
+          [107,"劉 玲男","遠藤(真)"],
+          [407,"柳橋 茉弥","長広"],
+          [405,"内藤 大生","長広"],
+          [220,"銅木 彩人","奥田"],
+          null,
+          null,
+          null,
+        ]
+      },
+      {
+        label: "田中",
+        cells: [
+          [202,"岩本 健太郎","堀口"],
+          [149,"鈴木 理久","澤中"],
+          [205,"保科 孝好","石田"],
+          null,
+          [218,"山城 そよか","奥田"],
+          null,
+          null,
+          [121,"関口 真衣","長広"],
+        ]
+      },
+      {
+        label: "後藤",
+        cells: [
+          [209,"伊藤 哲平","石田"],
+          [159,"建内 香子","堀口"],
+          [116,"相曽 友里花","長広"],
+          null,
+          null,
+          null,
+          null,
+          [117,"中尾 明日美","長広"],
+        ]
+      },
+      {
+        label: "戸祭",
+        cells: [
+          [226,"吉田 嵩","川﨑"],
+          [225,"吉田 真紀","奥田"],
+          null,
+          null,
+          null,
+          null,
+          null,
+          [301,"溝呂木 優","遠藤(真)"],
+        ]
+      },
+    ]
+  },
+];
+
+// ============================================================
+//  STATE
+// ============================================================
+// id = "d{dateIdx}_r{rowIdx}_c{colIdx}"
+const states = {};
+const cardData = {};
+
+function cid(d,r,c){ return `d${d}r${r}c${c}`; }
+
+DATES.forEach((date, di) => {
+  date.rows.forEach((row, ri) => {
+    row.cells.forEach((cell, ci) => {
+      const id = cid(di,ri,ci);
+      states[id] = 0;
+      cardData[id] = cell
+        ? { num: String(cell[0]), name: cell[1], staff: cell[2] }
+        : { num: "", name: "", staff: "" };
+    });
+  });
+});
+
+// ============================================================
+//  BUILD UI
+// ============================================================
+function slotEnd(slot) {
+  const [h,m] = slot.split(':').map(Number);
+  const t = h*60+m+15;
+  return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+}
+
+function buildAll() {
+  const tabsEl = document.getElementById('tabs');
+  const secsEl = document.getElementById('sections');
+
+  DATES.forEach((date, di) => {
+    // Tab
+    const tab = document.createElement('div');
+    tab.className = 'tab' + (di===0?' on':'');
+    tab.textContent = date.label;
+    tab.onclick = () => switchDate(di);
+    tabsEl.appendChild(tab);
+
+    // Section
+    const sec = document.createElement('div');
+    sec.className = 'sec' + (di===0?' on':'');
+    sec.id = `sec${di}`;
+
+    const table = document.createElement('table');
+    table.className = 'grid';
+
+    // Header row
+    const thead = document.createElement('thead');
+    const tr0 = document.createElement('tr');
+    const corner = document.createElement('th');
+    corner.className = 'th-corner';
+    tr0.appendChild(corner);
+
+    SLOTS.forEach(slot => {
+      const th = document.createElement('th');
+      th.className = 'th-time';
+      th.innerHTML = `${slot}<br><span style="opacity:.6;font-weight:400">〜${slotEnd(slot)}</span>`;
+      tr0.appendChild(th);
+    });
+    thead.appendChild(tr0);
+    table.appendChild(thead);
+
+    // Body rows
+    const tbody = document.createElement('tbody');
+    date.rows.forEach((row, ri) => {
+      const tr = document.createElement('tr');
+
+      // Row label (講師)
+      const tdLabel = document.createElement('td');
+      tdLabel.className = 'th-row';
+      tdLabel.textContent = row.label;
+      tr.appendChild(tdLabel);
+
+      SLOTS.forEach((_, ci) => {
+        const id = cid(di, ri, ci);
+        const td = document.createElement('td');
+        td.className = 'td';
+        td.appendChild(makeCard(id));
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    sec.appendChild(table);
+    secsEl.appendChild(sec);
+  });
+
+  updateStats();
+}
+
+function makeCard(id) {
+  const d = cardData[id];
+  const s = states[id];
+  const empty = !d.name && !d.num;
+
+  const card = document.createElement('div');
+  card.className = 'card' + (empty ? ' empty' : '');
+  card.dataset.s = s;
+  card.dataset.id = id;
+
+  if (empty) {
+    card.textContent = '＋';
+    card.onclick = () => openModal(id);
+    return card;
+  }
+
+  card.innerHTML = `
+    <div class="c-num">${d.num}</div>
+    <div class="c-body">
+      <div class="c-name">${d.name}</div>
+      <div class="c-staff">${d.staff}</div>
+    </div>
+    <div class="c-dot"></div>
+  `;
+
+  // タップ → 状態サイクル  /  長押し → 編集
+  let pt = null, lp = false;
+
+  function startPress() { lp=false; pt=setTimeout(()=>{ lp=true; openModal(id); },600); }
+  function endPress() { clearTimeout(pt); }
+  function cancelPress() { clearTimeout(pt); }
+
+  card.addEventListener('touchstart', startPress, {passive:true});
+  card.addEventListener('touchend', ()=>{ endPress(); if(!lp) advance(id); }, {passive:true});
+  card.addEventListener('touchmove', cancelPress, {passive:true});
+  card.addEventListener('touchcancel', cancelPress, {passive:true});
+
+  card.addEventListener('mousedown', startPress);
+  card.addEventListener('mouseup', endPress);
+  card.addEventListener('mouseleave', cancelPress);
+  card.addEventListener('click', ()=>{ if(!lp) advance(id); });
+
+  return card;
+}
+
+function refreshCard(id) {
+  const el = document.querySelector(`.card[data-id="${id}"]`);
+  if (!el) return;
+  el.parentNode.replaceChild(makeCard(id), el);
+}
+
+function advance(id) {
+  states[id] = (states[id]+1)%4;
+  const el = document.querySelector(`.card[data-id="${id}"]`);
+  if (el) el.dataset.s = states[id];
+  updateStats();
+}
+
+function switchDate(di) {
+  document.querySelectorAll('.tab').forEach((t,i)=> t.classList.toggle('on', i===di));
+  document.querySelectorAll('.sec').forEach((s,i)=> s.classList.toggle('on', i===di));
+}
+
+function updateStats() {
+  const ids = Object.keys(states);
+  document.getElementById('s1').textContent = ids.filter(id=>states[id]===1).length;
+  document.getElementById('s2').textContent = ids.filter(id=>states[id]===2).length;
+  document.getElementById('s3').textContent = ids.filter(id=>states[id]===3).length;
+}
+
+function confirmReset() {
+  if (!confirm('全カードの状態をリセットしますか？')) return;
+  Object.keys(states).forEach(id => states[id]=0);
+  document.querySelectorAll('.card').forEach(c => c.dataset.s=0);
+  updateStats();
+}
+
+// ─── MODAL ───
+let editId=null, mState=0;
+
+function openModal(id) {
+  editId = id;
+  const d = cardData[id];
+  document.getElementById('mNum').value   = d.num;
+  document.getElementById('mName').value  = d.name;
+  document.getElementById('mStaff').value = d.staff;
+  mState = states[id];
+  refreshSBtns();
+  document.getElementById('overlay').classList.add('on');
+  setTimeout(()=>document.getElementById('mName').focus(), 80);
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('on');
+  editId = null;
+}
+
+function pickState(s) { mState=s; refreshSBtns(); }
+
+function refreshSBtns() {
+  document.querySelectorAll('.sb').forEach(b => {
+    b.classList.toggle('on', parseInt(b.dataset.s)===mState);
+  });
+}
+
+function saveModal() {
+  if (!editId) return;
+  cardData[editId] = {
+    num:   document.getElementById('mNum').value.trim(),
+    name:  document.getElementById('mName').value.trim(),
+    staff: document.getElementById('mStaff').value.trim(),
+  };
+  states[editId] = mState;
+  refreshCard(editId);
+  updateStats();
+  closeModal();
+}
+
+document.getElementById('overlay').addEventListener('click', e=>{
+  if (e.target===document.getElementById('overlay')) closeModal();
+});
+document.addEventListener('keydown', e=>{
+  if (e.key==='Escape') closeModal();
+});
+
+buildAll();
+</script>
+</body>
+</html>
