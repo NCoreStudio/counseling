@@ -245,7 +245,7 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
     <div class="pill p2">②中 <b id="s2">0</b></div>
     <div class="pill p3">③終了 <b id="s3">0</b></div>
   </div>
-  <button id="btnReset" onclick="confirmReset()">全リセット</button>
+  <button id="btnReset">全リセット</button>
 </div>
 
 <div id="tabs"></div>
@@ -278,15 +278,15 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
     <div class="mf">
       <label class="ml">状態</label>
       <div class="sbg">
-        <button class="sb" data-s="0" onclick="pickState(0)">⓪ 未来校</button>
-        <button class="sb" data-s="1" onclick="pickState(1)">① 来校</button>
-        <button class="sb" data-s="2" onclick="pickState(2)">② カウンセリング中</button>
-        <button class="sb" data-s="3" onclick="pickState(3)">③ 終了</button>
+        <button class="sb" data-s="0" data-pick="0">⓪ 未来校</button>
+        <button class="sb" data-s="1" data-pick="1">① 来校</button>
+        <button class="sb" data-s="2" data-pick="2">② カウンセリング中</button>
+        <button class="sb" data-s="3" data-pick="3">③ 終了</button>
       </div>
     </div>
     <div class="ma">
-      <button class="mbtn cancel" onclick="closeModal()">戻る</button>
-      <button class="mbtn save" onclick="saveModal()">保存する</button>
+      <button class="mbtn cancel">戻る</button>
+      <button class="mbtn save">保存する</button>
     </div>
   </div>
 </div>
@@ -782,13 +782,43 @@ function saveModal() {
   closeModal();
 }
 
-document.getElementById('overlay').addEventListener('click', e=>{
-  if (e.target===document.getElementById('overlay')) closeModal();
-});
-document.addEventListener('keydown', e=>{
-  if (e.key==='Escape') closeModal();
-});
 
+// ============================================================
+//  モーダル・ボタンのイベント登録（type=module対応）
+// ============================================================
+function setupEvents() {
+  // 戻るボタン
+  document.querySelector('.mbtn.cancel').addEventListener('click', closeModal);
+  document.querySelector('.mbtn.cancel').addEventListener('touchend', (e)=>{ e.preventDefault(); closeModal(); });
+
+  // 保存ボタン
+  document.querySelector('.mbtn.save').addEventListener('click', saveModal);
+  document.querySelector('.mbtn.save').addEventListener('touchend', (e)=>{ e.preventDefault(); saveModal(); });
+
+  // 状態選択ボタン
+  document.querySelectorAll('.sb[data-pick]').forEach(btn => {
+    const s = parseInt(btn.dataset.pick);
+    btn.addEventListener('click', () => pickState(s));
+    btn.addEventListener('touchend', (e)=>{ e.preventDefault(); pickState(s); });
+  });
+
+  // 全リセットボタン
+  const resetBtn = document.getElementById('btnReset');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', confirmReset);
+    resetBtn.addEventListener('touchend', (e)=>{ e.preventDefault(); confirmReset(); });
+  }
+
+  // オーバーレイ外タップで閉じる
+  document.getElementById('overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('overlay')) closeModal();
+  });
+
+  // キーボード
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+}
 // ============================================================
 //  Firebase リアルタイム受信
 //  他端末の変更を受け取り、自分の画面に反映する
@@ -809,6 +839,7 @@ onValue(dbRef, (snapshot) => {
   if (!fbInitialized) {
     fbInitialized = true;
     buildAll();
+    setupEvents();
     setConnected(true);
     return;
   }
@@ -839,7 +870,7 @@ function setConnected(ok) {
 
 // Firebase 接続前のフォールバック（3秒後も未初期化なら通常起動）
 setTimeout(() => {
-  if (!fbInitialized) { fbInitialized = true; buildAll(); }
+  if (!fbInitialized) { fbInitialized = true; buildAll(); setupEvents(); }
 }, 3000);
 </script>
 </body>
