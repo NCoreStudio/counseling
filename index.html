@@ -233,7 +233,13 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
 <body>
 
 <div id="topbar">
-  <h1>📋 カウンセリング管理表</h1>
+  <h1>📋 カウンセリング管理表
+  <span id="connDot" title="接続確認中..." style="
+    display:inline-block; width:9px; height:9px; border-radius:50%;
+    background:#f59e0b; margin-left:6px; vertical-align:middle;
+    box-shadow:0 0 4px currentColor;
+  "></span>
+</h1>
   <div class="stats">
     <div class="pill p1">①来校 <b id="s1">0</b></div>
     <div class="pill p2">②中 <b id="s2">0</b></div>
@@ -285,7 +291,29 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
   </div>
 </div>
 
-<script>
+<script type="module">
+// ============================================================
+//  Firebase Realtime Database セットアップ
+// ============================================================
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, update, set }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCB-jqr44VL5JSKvGeapqifsoyhGjheUXs",
+  authDomain: "counseling-board.firebaseapp.com",
+  databaseURL: "https://counseling-board-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "counseling-board",
+  storageBucket: "counseling-board.firebasestorage.app",
+  messagingSenderId: "786804443772",
+  appId: "1:786804443772:web:44ea7726edd91ad16c57f9"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db    = getDatabase(fbApp);
+const dbRef = ref(db, 'counseling/states');
+
 // ============================================================
 //  完全データ (Excelから正確に取得)
 //  各行: [番号, 氏名, 担当] または null(空セル)
@@ -685,6 +713,8 @@ function advance(id) {
   const el = document.querySelector(`.card[data-id="${id}"]`);
   if (el) el.dataset.s = states[id];
   updateStats();
+  // Firebase に即時書き込み → 他端末にリアルタイム反映
+  update(dbRef, { [id]: states[id] });
 }
 
 function switchDate(di) {
@@ -701,9 +731,12 @@ function updateStats() {
 
 function confirmReset() {
   if (!confirm('全カードの状態をリセットしますか？')) return;
-  Object.keys(states).forEach(id => states[id]=0);
+  const allZero = {};
+  Object.keys(states).forEach(id => { states[id]=0; allZero[id]=0; });
   document.querySelectorAll('.card').forEach(c => c.dataset.s=0);
   updateStats();
+  // Firebase に一括書き込み
+  set(dbRef, allZero);
 }
 
 // ─── MODAL ───
@@ -744,6 +777,8 @@ function saveModal() {
   states[editId] = mState;
   refreshCard(editId);
   updateStats();
+  // 状態変更を Firebase に書き込み
+  update(dbRef, { [editId]: states[editId] });
   closeModal();
 }
 
@@ -754,7 +789,58 @@ document.addEventListener('keydown', e=>{
   if (e.key==='Escape') closeModal();
 });
 
-buildAll();
+// ============================================================
+//  Firebase リアルタイム受信
+//  他端末の変更を受け取り、自分の画面に反映する
+// ============================================================
+let fbInitialized = false;
+
+onValue(dbRef, (snapshot) => {
+  const remote = snapshot.val() || {};
+
+  // 初回ロード時：Firebaseの状態でローカルを上書き
+  Object.keys(remote).forEach(id => {
+    if (states[id] !== undefined) {
+      states[id] = remote[id];
+    }
+  });
+
+  // 初回のみ buildAll を呼び出す（以降は差分更新）
+  if (!fbInitialized) {
+    fbInitialized = true;
+    buildAll();
+    setConnected(true);
+    return;
+  }
+
+  // 2回目以降：差分をカードに反映
+  Object.keys(remote).forEach(id => {
+    if (states[id] !== undefined) {
+      const el = document.querySelector(`.card[data-id="${id}"]`);
+      if (el && parseInt(el.dataset.s) !== remote[id]) {
+        states[id] = remote[id];
+        el.dataset.s = remote[id];
+      }
+    }
+  });
+  updateStats();
+});
+
+// 接続状態インジケーター
+const connRef = ref(db, '.info/connected');
+onValue(connRef, (snap) => { setConnected(snap.val() === true); });
+
+function setConnected(ok) {
+  const el = document.getElementById('connDot');
+  if (!el) return;
+  el.style.background = ok ? '#22c55e' : '#ef4444';
+  el.title = ok ? '接続中' : '接続切断';
+}
+
+// Firebase 接続前のフォールバック（3秒後も未初期化なら通常起動）
+setTimeout(() => {
+  if (!fbInitialized) { fbInitialized = true; buildAll(); }
+}, 3000);
 </script>
 </body>
 </html>
