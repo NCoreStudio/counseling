@@ -594,7 +594,16 @@ function makeCard(id) {
 
   if (empty) {
     card.textContent = '＋';
-    card.onclick = () => openModal(id);
+    // 空セルはタッチ・クリック両方でモーダルを開く（二重防止付き）
+    let emptyLastTouch = 0;
+    card.addEventListener('touchend', (e) => {
+      e.preventDefault(); // clickの二重発火を防ぐ
+      emptyLastTouch = Date.now();
+      openModal(id);
+    }, { passive: false });
+    card.addEventListener('click', () => {
+      if (Date.now() - emptyLastTouch > 500) openModal(id);
+    });
     return card;
   }
 
@@ -607,22 +616,60 @@ function makeCard(id) {
     <div class="c-dot"></div>
   `;
 
-  // タップ → 状態サイクル  /  長押し → 編集
-  let pt = null, lp = false;
+  // ─── タッチ操作 ───
+  // iPad では touchend → click の二重発火が起きるため、
+  // タッチ系と mouse/click 系を完全に分離し、
+  // touchend で e.preventDefault() して click を抑制する。
+  let pressTimer = null;
+  let longPressed = false;
+  let touchMoved = false;
+  let lastTouchEnd = 0;
 
-  function startPress() { lp=false; pt=setTimeout(()=>{ lp=true; openModal(id); },600); }
-  function endPress() { clearTimeout(pt); }
-  function cancelPress() { clearTimeout(pt); }
+  card.addEventListener('touchstart', (e) => {
+    longPressed = false;
+    touchMoved = false;
+    pressTimer = setTimeout(() => {
+      longPressed = true;
+      openModal(id);
+    }, 600);
+  }, { passive: true });
 
-  card.addEventListener('touchstart', startPress, {passive:true});
-  card.addEventListener('touchend', ()=>{ endPress(); if(!lp) advance(id); }, {passive:true});
-  card.addEventListener('touchmove', cancelPress, {passive:true});
-  card.addEventListener('touchcancel', cancelPress, {passive:true});
+  card.addEventListener('touchmove', () => {
+    touchMoved = true;
+    clearTimeout(pressTimer);
+  }, { passive: true });
 
-  card.addEventListener('mousedown', startPress);
-  card.addEventListener('mouseup', endPress);
-  card.addEventListener('mouseleave', cancelPress);
-  card.addEventListener('click', ()=>{ if(!lp) advance(id); });
+  card.addEventListener('touchcancel', () => {
+    clearTimeout(pressTimer);
+    longPressed = false;
+  }, { passive: true });
+
+  card.addEventListener('touchend', (e) => {
+    e.preventDefault(); // ← これがキモ：click の二重発火を完全に防ぐ
+    clearTimeout(pressTimer);
+    lastTouchEnd = Date.now();
+    if (!longPressed && !touchMoved) {
+      advance(id); // タップ → 状態を1つ進める
+    }
+    longPressed = false;
+    touchMoved = false;
+  }, { passive: false }); // preventDefault を使うので passive:false
+
+  // マウス用（PC）：タッチ操作後 500ms 以内は無視して二重実行を防ぐ
+  card.addEventListener('mousedown', () => {
+    if (Date.now() - lastTouchEnd < 500) return;
+    longPressed = false;
+    pressTimer = setTimeout(() => {
+      longPressed = true;
+      openModal(id);
+    }, 600);
+  });
+  card.addEventListener('mouseup', () => { clearTimeout(pressTimer); });
+  card.addEventListener('mouseleave', () => { clearTimeout(pressTimer); });
+  card.addEventListener('click', () => {
+    if (Date.now() - lastTouchEnd < 500) return; // タッチ後はスキップ
+    if (!longPressed) advance(id);
+  });
 
   return card;
 }
