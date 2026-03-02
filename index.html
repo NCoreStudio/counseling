@@ -311,8 +311,9 @@ const firebaseConfig = {
 };
 
 const fbApp = initializeApp(firebaseConfig);
-const db    = getDatabase(fbApp);
-const dbRef = ref(db, 'counseling/states');
+const db       = getDatabase(fbApp);
+const dbRef    = ref(db, 'counseling/states');
+const cardRef  = ref(db, 'counseling/cards');
 
 // ============================================================
 //  完全データ (Excelから正確に取得)
@@ -777,8 +778,9 @@ function saveModal() {
   states[editId] = mState;
   refreshCard(editId);
   updateStats();
-  // 状態変更を Firebase に書き込み
-  update(dbRef, { [editId]: states[editId] });
+  // 状態 + カードデータ（氏名・番号・担当）を Firebase に書き込み → 全端末に同期
+  update(dbRef,   { [editId]: states[editId] });
+  update(cardRef, { [editId]: cardData[editId] });
   closeModal();
 }
 
@@ -824,6 +826,22 @@ function setupEvents() {
 //  他端末の変更を受け取り、自分の画面に反映する
 // ============================================================
 let fbInitialized = false;
+
+// cardData（氏名・番号・担当）のリアルタイム同期
+onValue(cardRef, (snapshot) => {
+  const remoteCards = snapshot.val() || {};
+  Object.keys(remoteCards).forEach(id => {
+    if (cardData[id] !== undefined) {
+      const prev = cardData[id];
+      const next = remoteCards[id];
+      // 変更があればカードを再描画
+      if (prev.name !== next.name || prev.num !== next.num || prev.staff !== next.staff) {
+        cardData[id] = next;
+        if (fbInitialized) refreshCard(id);
+      }
+    }
+  });
+});
 
 onValue(dbRef, (snapshot) => {
   const remote = snapshot.val() || {};
