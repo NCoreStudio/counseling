@@ -50,6 +50,11 @@ body { display: flex; flex-direction: column; }
 .p2 { background: #fef9c3; color: #78350f; }
 .p3 { background: #e5e7eb; color: #4b5563; }
 
+#btnImport {
+  background: #059669; color: #fff; border: none; border-radius: 8px;
+  padding: 8px 11px; font-size: .75rem; font-weight: 700; font-family: inherit;
+  cursor: pointer; touch-action: manipulation; white-space: nowrap;
+}
 #btnReset {
   margin-left: auto;
   background: #dc2626; color: #fff; border: none; border-radius: 8px;
@@ -66,14 +71,15 @@ body { display: flex; flex-direction: column; }
 }
 #tabs::-webkit-scrollbar { display: none; }
 .tab {
-  padding: 0 22px; height: 100%;
-  display: flex; align-items: center;
+  padding: 0 18px; height: 100%;
+  display: flex; align-items: center; gap: 5px;
   color: #64748b; font-size: .85rem; font-weight: 600;
   cursor: pointer; white-space: nowrap;
   border-bottom: 3px solid transparent; margin-bottom: -2px;
   touch-action: manipulation;
 }
 .tab.on { color: #38bdf8; border-bottom-color: #38bdf8; }
+
 
 /* ─── LEGEND ─── */
 #legend {
@@ -92,9 +98,7 @@ body { display: flex; flex-direction: column; }
 .leghint { margin-left: auto; font-size: .62rem; color: #475569; white-space: nowrap; }
 
 /* ─── SCROLL ─── */
-#scroller {
-  flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: 10px;
-}
+#scroller { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: 10px; }
 
 /* ─── SECTION ─── */
 .sec { display: none; }
@@ -102,7 +106,6 @@ body { display: flex; flex-direction: column; }
 
 /* ─── TABLE ─── */
 table.grid { border-collapse: separate; border-spacing: 4px; }
-
 .th-corner { min-width: 52px; width: 52px; }
 
 .th-time {
@@ -111,14 +114,38 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
   font-size: .68rem; font-weight: 700;
   text-align: center; vertical-align: middle;
   border-radius: 6px; white-space: nowrap; padding: 3px;
+  position: relative;
 }
-
 .th-row {
   min-width: 52px; width: 52px; height: var(--ch);
   background: #1e3a5f; color: #93c5fd;
   font-size: .75rem; font-weight: 700;
   text-align: center; vertical-align: middle;
-  border-radius: 6px;
+  border-radius: 6px; word-break: keep-all; padding: 4px 2px;
+  position: relative;
+}
+.hdr-pen {
+  position: absolute; top: 2px; right: 2px;
+  background: rgba(56,189,248,.2); border: none; border-radius: 3px;
+  color: #bfdbfe; font-size: .6rem; width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent; padding: 0;
+}
+.hdr-pen:active { background: rgba(56,189,248,.5); }
+.tab-pen {
+  background: none; border: none; color: #38bdf8; opacity: 0.6;
+  font-size: .65rem; cursor: pointer; touch-action: manipulation;
+  padding: 2px 3px; border-radius: 3px; margin-left: 2px;
+  -webkit-tap-highlight-color: transparent;
+  display: none;
+}
+.tab.on .tab-pen { display: inline-block; }
+.tab-pen:active { opacity: 1; background: rgba(56,189,248,.2); }
+/* PC（マウス操作）以外では鉛筆マークを非表示 */
+@media (hover: none) {
+  .hdr-pen { display: none !important; }
+  .tab-pen { display: none !important; }
 }
 
 .td { min-width: var(--cw); width: var(--cw); height: var(--ch); vertical-align: top; padding: 0; }
@@ -136,14 +163,12 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
   user-select: none;
 }
 .card:active { transform: scale(.96); transition: transform .05s; }
-
 .card.empty {
   border-style: dashed; border-color: #374151;
   background: rgba(255,255,255,.04);
   justify-content: center; align-items: center;
   color: #4b5563; font-size: 1.2rem;
 }
-
 .card[data-s="1"] { background: var(--s1-bg); border-color: var(--s1-bd); box-shadow: 0 0 0 2px rgba(244,114,160,.2); }
 .card[data-s="2"] { background: var(--s2-bg); border-color: var(--s2-bd); animation: gp 1.8s ease-in-out infinite; }
 .card[data-s="3"] { background: var(--s3-bg); border-color: var(--s3-bd); opacity: .65; }
@@ -172,10 +197,7 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
   font-size: .84rem; font-weight: 700; color: #111827;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3;
 }
-.c-staff {
-  font-size: .65rem; color: #6b7280;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
+.c-staff { font-size: .65rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card[data-s="1"] .c-name, .card[data-s="1"] .c-staff { color: var(--s1-tx); }
 .card[data-s="2"] .c-name, .card[data-s="2"] .c-staff { color: var(--s2-tx); }
 .card[data-s="3"] .c-name, .card[data-s="3"] .c-staff { color: var(--s3-tx); }
@@ -188,19 +210,24 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
 .card[data-s="2"] .c-dot { display: block; background: #eab308; box-shadow: 0 0 4px #eab308; }
 .card[data-s="3"] .c-dot { display: block; background: #9ca3af; }
 
-/* ─── MODAL ─── */
-#overlay {
+/* ─── MODAL 共通 ─── */
+.overlay-base {
   display: none; position: fixed; inset: 0;
   background: rgba(0,0,0,.65);
-  z-index: 999; justify-content: center; align-items: center; padding: 16px;
+  justify-content: center; align-items: center; padding: 16px;
 }
-#overlay.on { display: flex; }
-.modal {
+.overlay-base.on { display: flex; }
+#overlay       { z-index: 999; }
+#hdrOverlay    { z-index: 1000; }
+#excelOverlay  { z-index: 1001; }
+
+.modal-box {
   background: #fff; border-radius: 18px; padding: 22px;
   width: 100%; max-width: 360px;
   box-shadow: 0 30px 80px rgba(0,0,0,.5);
 }
-.modal h3 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: #111827; }
+.modal-box.wide { max-width: 420px; max-height: 90vh; overflow-y: auto; }
+.modal-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: #111827; }
 .mf { margin-bottom: 12px; }
 .ml { font-size: .72rem; color: #6b7280; font-weight: 600; margin-bottom: 5px; display: block; }
 .mi {
@@ -228,6 +255,40 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
 }
 .mbtn.cancel { background: #f1f5f9; color: #475569; flex: 0 0 80px; }
 .mbtn.save   { background: #2563eb; color: #fff; flex: 1; }
+.mbtn.green  { background: #059669; color: #fff; flex: 1; }
+.mbtn:disabled { opacity: .4; cursor: default; }
+
+/* ─── EXCEL UI ─── */
+.excel-drop {
+  border: 2px dashed #d1d5db; border-radius: 12px;
+  padding: 28px 16px; text-align: center;
+  cursor: pointer; transition: border-color .2s, background .2s;
+  margin-bottom: 12px;
+}
+.excel-drop:hover, .excel-drop.drag { border-color: #3b82f6; background: #eff6ff; }
+.excel-drop-icon { font-size: 2.2rem; margin-bottom: 6px; }
+.excel-drop-text { font-size: .85rem; color: #374151; font-weight: 600; }
+.excel-drop-sub { font-size: .72rem; color: #9ca3af; margin-top: 3px; }
+#excelFileInput { display: none; }
+
+.excel-format-hint {
+  background: #fef3c7; border-radius: 8px; padding: 10px 12px;
+  font-size: .7rem; color: #78350f; margin-bottom: 12px; line-height: 1.6;
+}
+.excel-format-hint b { display: block; margin-bottom: 4px; font-size: .75rem; }
+
+.excel-preview {
+  display: none; margin-bottom: 12px;
+  background: #f8fafc; border-radius: 10px; padding: 12px;
+  font-size: .75rem; color: #374151;
+}
+.excel-preview.on { display: block; }
+.excel-preview-title { font-weight: 700; margin-bottom: 6px; color: #1d4ed8; font-size: .78rem; }
+.excel-preview-row {
+  display: flex; gap: 6px; padding: 3px 0;
+  border-bottom: 1px solid #e5e7eb; flex-wrap: wrap;
+}
+.excel-preview-row:last-child { border-bottom: none; }
 </style>
 </head>
 <body>
@@ -238,13 +299,13 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
     display:inline-block; width:9px; height:9px; border-radius:50%;
     background:#f59e0b; margin-left:6px; vertical-align:middle;
     box-shadow:0 0 4px currentColor;
-  "></span>
-</h1>
+  "></span></h1>
   <div class="stats">
     <div class="pill p1">①来校 <b id="s1">0</b></div>
     <div class="pill p2">②中 <b id="s2">0</b></div>
     <div class="pill p3">③終了 <b id="s3">0</b></div>
   </div>
+  <button id="btnImport">📥 Excel取込</button>
   <button id="btnReset">全リセット</button>
 </div>
 
@@ -260,8 +321,9 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
 
 <div id="scroller"><div id="sections"></div></div>
 
-<div id="overlay">
-  <div class="modal">
+<!-- ① カード編集モーダル -->
+<div id="overlay" class="overlay-base">
+  <div class="modal-box">
     <h3>✏️ カード情報を編集</h3>
     <div class="mf">
       <label class="ml">番号</label>
@@ -285,15 +347,67 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
       </div>
     </div>
     <div class="ma">
-      <button class="mbtn cancel">戻る</button>
-      <button class="mbtn save">保存する</button>
+      <button class="mbtn cancel" id="cardCancel">戻る</button>
+      <button class="mbtn save"   id="cardSave">保存する</button>
     </div>
   </div>
 </div>
 
+<!-- ② ヘッダー編集モーダル（日付・時間・講師名） -->
+<div id="hdrOverlay" class="overlay-base">
+  <div class="modal-box">
+    <h3 id="hdrTitle">📝 ヘッダーを編集</h3>
+    <div class="mf">
+      <label class="ml" id="hdrLabel">名称</label>
+      <input class="mi" id="hdrInput" type="text">
+    </div>
+    <div class="mf" id="hdrEndWrap" style="display:none">
+      <label class="ml">終了時刻（例: 19:20）</label>
+      <input class="mi" id="hdrEndInput" type="text" placeholder="例: 19:20">
+    </div>
+    <div class="ma">
+      <button class="mbtn cancel" id="hdrCancel">戻る</button>
+      <button class="mbtn save"   id="hdrSave">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ③ Excel取込モーダル -->
+<div id="excelOverlay" class="overlay-base">
+  <div class="modal-box wide">
+    <h3>📥 Excelファイルから取込</h3>
+
+    <div class="excel-format-hint">
+      <b>📋 Excelフォーマット（1シート目・1行目はヘッダー行）</b>
+      A列: 番号　B列: 氏名　C列: 担当講師　D列: 日付ラベル（例: 3/2（月））<br>
+      E列: 時間スロット（例: 19:00）　F列: 講師ラベル（例: 戸祭）<br>
+      <span style="color:#92400e">G列: 新しい日付ラベル（変更時のみ）　H列: 新しい時間スロット（変更時のみ）</span><br>
+      ※ D〜F列を省略すると番号・氏名で既存カードを検索して上書き
+    </div>
+
+    <div class="excel-drop" id="excelDrop">
+      <div class="excel-drop-icon">📂</div>
+      <div class="excel-drop-text">クリック または ここにドロップ</div>
+      <div class="excel-drop-sub">.xlsx / .xls 対応</div>
+    </div>
+    <input type="file" id="excelFileInput" accept=".xlsx,.xls">
+
+    <div class="excel-preview" id="excelPreview">
+      <div class="excel-preview-title" id="excelPreviewTitle"></div>
+      <div id="excelPreviewRows"></div>
+    </div>
+
+    <div class="ma">
+      <button class="mbtn cancel" id="excelCancel">閉じる</button>
+      <button class="mbtn green"  id="excelApply" disabled>反映する</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script type="module">
 // ============================================================
-//  Firebase Realtime Database セットアップ
+//  Firebase
 // ============================================================
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -309,252 +423,201 @@ const firebaseConfig = {
   messagingSenderId: "786804443772",
   appId: "1:786804443772:web:44ea7726edd91ad16c57f9"
 };
-
-const fbApp = initializeApp(firebaseConfig);
-const db       = getDatabase(fbApp);
-const dbRef    = ref(db, 'counseling/states');
-const cardRef  = ref(db, 'counseling/cards');
+const fbApp   = initializeApp(firebaseConfig);
+const db      = getDatabase(fbApp);
+const dbRef   = ref(db, 'counseling/states');
+const cardRef = ref(db, 'counseling/cards');
+const hdrRef  = ref(db, 'counseling/headers');
 
 // ============================================================
-//  完全データ (Excelから正確に取得)
-//  各行: [番号, 氏名, 担当] または null(空セル)
-//  列順: 19:00, 19:15, 19:30, 19:45, 20:00, 20:15, 20:30, 20:45
+//  固定定数（変更不可）
 // ============================================================
+const MAX_DATES = 4;
+const MAX_ROWS  = 4;
+const MAX_COLS  = 8;
 
-const SLOTS = ["19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45"];
-
-const DATES = [
-  {
-    label: "3/2（月）",
-    rows: [
-      {
-        label: "戸祭",
-        cells: [
-          [308,"落合 夏実","長広"],
-          [327,"檜垣 初音","町田"],
-          [129,"乙野 圭史","長広"],
-          [152,"門野 美希","澤中"],
-          [234,"荒木 洸人","川﨑"],
-          [235,"篠木 愛海","川﨑"],
-          [232,"髙橋 奈緒","遠藤(洋)"],
-          [322,"兎澤 胡桃","奥田"],
-        ]
-      },
-      {
-        label: "田中",
-        cells: [
-          [312,"古木 美有","澤中"],
-          [302,"香月 元気","遠藤(真)"],
-          [113,"知名 定彦","長広"],
-          [161,"蓮 勇貴","長広"],
-          [246,"大髙 匠海","石田"],
-          [156,"田島 栞","石田"],
-          [230,"池澤 友真","堀口"],
-          [132,"和田 優希","長広"],
-        ]
-      },
-      {
-        label: "小杉",
-        cells: [
-          [325,"下山 雅人","町田"],
-          [128,"佐藤 果澄","長広"],
-          [138,"岡嶋 翔太","長広"],
-          [127,"後藤 空也","長広"],
-          [242,"横尾 允徳","堀口"],
-          [139,"山川 夏輝","澤中"],
-          [201,"呉 昭彦","堀口"],
-          [133,"和田 勇人","長広"],
-        ]
-      },
-    ]
-  },
-  {
-    label: "3/3（火）",
-    rows: [
-      {
-        label: "田村",
-        cells: [
-          [410,"西崎 里美","奥田"],
-          [306,"村上 礼治","石田"],
-          [411,"吉川 千尋","長広"],
-          [318,"井口 豪","奥田"],
-          [104,"中島 ことな","遠藤(真)"],
-          [330,"佐藤 啓春","川﨑"],
-          [143,"真壁 智生","澤中"],
-          [147,"藤江 桜良","澤中"],
-        ]
-      },
-      {
-        label: "後藤",
-        cells: [
-          [333,"辻 和也","遠藤(真)"],
-          [310,"李沢 達弥","澤中"],
-          [303,"小林 澪生","遠藤(真)"],
-          [162,"佐古 大樹","遠藤(真)"],
-          [229,"白倉 海翔","堀口"],
-          [238,"西田 龍生","遠藤(真)"],
-          [136,"小向井 紫帆","長広"],
-          [130,"河野辺 悠仁","長広"],
-        ]
-      },
-      {
-        label: "戸祭",
-        cells: [
-          [151,"土田 ののか","長広"],
-          [102,"石田 章人","遠藤(真)"],
-          [313,"田中 瑞季","澤中"],
-          [118,"伊藤 朱里","長広"],
-          [206,"清水 愛和","石田"],
-          [241,"黒澤 一樹","遠藤(真)"],
-          [135,"池崎 夢菜","長広"],
-          null,
-        ]
-      },
-    ]
-  },
-  {
-    label: "3/4（水）",
-    rows: [
-      {
-        label: "戸祭",
-        cells: [
-          [305,"渡邊 萌生香","遠藤(真)"],
-          [331,"石橋 美智子","川﨑"],
-          [316,"根岸 真子","澤中"],
-          [304,"佐藤 琢磨","遠藤(真)"],
-          [403,"初見 拓哉","木谷"],
-          [324,"那音 太","奥田"],
-          [203,"山田 周平","川﨑"],
-          [332,"渡邉 健太郎","石田"],
-        ]
-      },
-      {
-        label: "後藤",
-        cells: [
-          [101,"呉 理恵","遠藤(真)"],
-          [204,"江草 紘明","遠藤(洋)"],
-          [404,"大村 英人","長広"],
-          [408,"松本 綾子","澤中"],
-          null,
-          null,
-          [110,"五十嵐 美紗","遠藤(真)"],
-          [320,"小川 千明","澤中"],
-        ]
-      },
-      {
-        label: "小杉",
-        cells: [
-          [144,"藤村 知紀","澤中"],
-          [406,"井浦 克裕","長広"],
-          [119,"粟原 将仁","長広"],
-          [328,"久恒 友海","堀口"],
-          null,
-          null,
-          [323,"大森 聡","奥田"],
-          [315,"岩本 祥馬","澤中"],
-        ]
-      },
-    ]
-  },
-  {
-    label: "3/5（木）",
-    rows: [
-      {
-        label: "田村",
-        cells: [
-          [401,"中西 洋平","遠藤(真)"],
-          [107,"劉 玲男","遠藤(真)"],
-          [407,"柳橋 茉弥","長広"],
-          [405,"内藤 大生","長広"],
-          [220,"銅木 彩人","奥田"],
-          null,
-          null,
-          null,
-        ]
-      },
-      {
-        label: "田中",
-        cells: [
-          [202,"岩本 健太郎","堀口"],
-          [149,"鈴木 理久","澤中"],
-          [205,"保科 孝好","石田"],
-          null,
-          [218,"山城 そよか","奥田"],
-          null,
-          null,
-          [121,"関口 真衣","長広"],
-        ]
-      },
-      {
-        label: "後藤",
-        cells: [
-          [209,"伊藤 哲平","石田"],
-          [159,"建内 香子","堀口"],
-          [116,"相曽 友里花","長広"],
-          null,
-          null,
-          null,
-          null,
-          [117,"中尾 明日美","長広"],
-        ]
-      },
-      {
-        label: "戸祭",
-        cells: [
-          [226,"吉田 嵩","川﨑"],
-          [225,"吉田 真紀","奥田"],
-          null,
-          null,
-          null,
-          null,
-          null,
-          [301,"溝呂木 優","遠藤(真)"],
-        ]
-      },
-    ]
-  },
+const DEFAULT_SLOTS = [
+  {start:"19:00",end:"19:15"},{start:"19:15",end:"19:30"},
+  {start:"19:30",end:"19:45"},{start:"19:45",end:"20:00"},
+  {start:"20:00",end:"20:15"},{start:"20:15",end:"20:30"},
+  {start:"20:30",end:"20:45"},{start:"20:45",end:"21:00"},
 ];
 
 // ============================================================
-//  STATE
+//  ヘッダーデータ（編集可能・Firebase同期対象）
 // ============================================================
-// id = "d{dateIdx}_r{rowIdx}_c{colIdx}"
-const states = {};
-const cardData = {};
+let hdrData = {
+  dates: [
+    {
+      label: "3/2（月）",
+      slots: [...DEFAULT_SLOTS],
+      rows: [ {label:"戸祭"}, {label:"田中"}, {label:"小杉"}, {label:"（空）"} ]
+    },
+    {
+      label: "3/3（火）",
+      slots: [...DEFAULT_SLOTS],
+      rows: [ {label:"田村"}, {label:"後藤"}, {label:"戸祭"}, {label:"（空）"} ]
+    },
+    {
+      label: "3/4（水）",
+      slots: [...DEFAULT_SLOTS],
+      rows: [ {label:"戸祭"}, {label:"後藤"}, {label:"小杉"}, {label:"（空）"} ]
+    },
+    {
+      label: "3/5（木）",
+      slots: [...DEFAULT_SLOTS],
+      rows: [ {label:"田村"}, {label:"田中"}, {label:"後藤"}, {label:"戸祭"} ]
+    },
+  ]
+};
 
+// ============================================================
+//  初期カードデータ
+// ============================================================
+const INITIAL_CARDS = {
+  // 3/2 row0
+  d0r0c0:{num:"308",name:"落合 夏実",staff:"長広"},
+  d0r0c1:{num:"327",name:"檜垣 初音",staff:"町田"},
+  d0r0c2:{num:"129",name:"乙野 圭史",staff:"長広"},
+  d0r0c3:{num:"152",name:"門野 美希",staff:"澤中"},
+  d0r0c4:{num:"234",name:"荒木 洸人",staff:"川﨑"},
+  d0r0c5:{num:"235",name:"篠木 愛海",staff:"川﨑"},
+  d0r0c6:{num:"232",name:"髙橋 奈緒",staff:"遠藤(洋)"},
+  d0r0c7:{num:"322",name:"兎澤 胡桃",staff:"奥田"},
+  // 3/2 row1
+  d0r1c0:{num:"312",name:"古木 美有",staff:"澤中"},
+  d0r1c1:{num:"302",name:"香月 元気",staff:"遠藤(真)"},
+  d0r1c2:{num:"113",name:"知名 定彦",staff:"長広"},
+  d0r1c3:{num:"161",name:"蓮 勇貴",staff:"長広"},
+  d0r1c4:{num:"246",name:"大髙 匠海",staff:"石田"},
+  d0r1c5:{num:"156",name:"田島 栞",staff:"石田"},
+  d0r1c6:{num:"230",name:"池澤 友真",staff:"堀口"},
+  d0r1c7:{num:"132",name:"和田 優希",staff:"長広"},
+  // 3/2 row2
+  d0r2c0:{num:"325",name:"下山 雅人",staff:"町田"},
+  d0r2c1:{num:"128",name:"佐藤 果澄",staff:"長広"},
+  d0r2c2:{num:"138",name:"岡嶋 翔太",staff:"長広"},
+  d0r2c3:{num:"127",name:"後藤 空也",staff:"長広"},
+  d0r2c4:{num:"242",name:"横尾 允徳",staff:"堀口"},
+  d0r2c5:{num:"139",name:"山川 夏輝",staff:"澤中"},
+  d0r2c6:{num:"201",name:"呉 昭彦",staff:"堀口"},
+  d0r2c7:{num:"133",name:"和田 勇人",staff:"長広"},
+  // 3/2 row3 → 空
+  // 3/3 row0
+  d1r0c0:{num:"410",name:"西崎 里美",staff:"奥田"},
+  d1r0c1:{num:"306",name:"村上 礼治",staff:"石田"},
+  d1r0c2:{num:"411",name:"吉川 千尋",staff:"長広"},
+  d1r0c3:{num:"318",name:"井口 豪",staff:"奥田"},
+  d1r0c4:{num:"104",name:"中島 ことな",staff:"遠藤(真)"},
+  d1r0c5:{num:"330",name:"佐藤 啓春",staff:"川﨑"},
+  d1r0c6:{num:"143",name:"真壁 智生",staff:"澤中"},
+  d1r0c7:{num:"147",name:"藤江 桜良",staff:"澤中"},
+  // 3/3 row1
+  d1r1c0:{num:"333",name:"辻 和也",staff:"遠藤(真)"},
+  d1r1c1:{num:"310",name:"李沢 達弥",staff:"澤中"},
+  d1r1c2:{num:"303",name:"小林 澪生",staff:"遠藤(真)"},
+  d1r1c3:{num:"162",name:"佐古 大樹",staff:"遠藤(真)"},
+  d1r1c4:{num:"229",name:"白倉 海翔",staff:"堀口"},
+  d1r1c5:{num:"238",name:"西田 龍生",staff:"遠藤(真)"},
+  d1r1c6:{num:"136",name:"小向井 紫帆",staff:"長広"},
+  d1r1c7:{num:"130",name:"河野辺 悠仁",staff:"長広"},
+  // 3/3 row2
+  d1r2c0:{num:"151",name:"土田 ののか",staff:"長広"},
+  d1r2c1:{num:"102",name:"石田 章人",staff:"遠藤(真)"},
+  d1r2c2:{num:"313",name:"田中 瑞季",staff:"澤中"},
+  d1r2c3:{num:"118",name:"伊藤 朱里",staff:"長広"},
+  d1r2c4:{num:"206",name:"清水 愛和",staff:"石田"},
+  d1r2c5:{num:"241",name:"黒澤 一樹",staff:"遠藤(真)"},
+  d1r2c6:{num:"135",name:"池崎 夢菜",staff:"長広"},
+  // d1r2c7 空
+  // 3/3 row3 → 空
+  // 3/4 row0
+  d2r0c0:{num:"305",name:"渡邊 萌生香",staff:"遠藤(真)"},
+  d2r0c1:{num:"331",name:"石橋 美智子",staff:"川﨑"},
+  d2r0c2:{num:"316",name:"根岸 真子",staff:"澤中"},
+  d2r0c3:{num:"304",name:"佐藤 琢磨",staff:"遠藤(真)"},
+  d2r0c4:{num:"403",name:"初見 拓哉",staff:"木谷"},
+  d2r0c5:{num:"324",name:"那音 太",staff:"奥田"},
+  d2r0c6:{num:"203",name:"山田 周平",staff:"川﨑"},
+  d2r0c7:{num:"332",name:"渡邉 健太郎",staff:"石田"},
+  // 3/4 row1
+  d2r1c0:{num:"101",name:"呉 理恵",staff:"遠藤(真)"},
+  d2r1c1:{num:"204",name:"江草 紘明",staff:"遠藤(洋)"},
+  d2r1c2:{num:"404",name:"大村 英人",staff:"長広"},
+  d2r1c3:{num:"408",name:"松本 綾子",staff:"澤中"},
+  d2r1c6:{num:"110",name:"五十嵐 美紗",staff:"遠藤(真)"},
+  d2r1c7:{num:"320",name:"小川 千明",staff:"澤中"},
+  // 3/4 row2
+  d2r2c0:{num:"144",name:"藤村 知紀",staff:"澤中"},
+  d2r2c1:{num:"406",name:"井浦 克裕",staff:"長広"},
+  d2r2c2:{num:"119",name:"粟原 将仁",staff:"長広"},
+  d2r2c3:{num:"328",name:"久恒 友海",staff:"堀口"},
+  d2r2c6:{num:"323",name:"大森 聡",staff:"奥田"},
+  d2r2c7:{num:"315",name:"岩本 祥馬",staff:"澤中"},
+  // 3/4 row3 → 空
+  // 3/5 row0
+  d3r0c0:{num:"401",name:"中西 洋平",staff:"遠藤(真)"},
+  d3r0c1:{num:"107",name:"劉 玲男",staff:"遠藤(真)"},
+  d3r0c2:{num:"407",name:"柳橋 茉弥",staff:"長広"},
+  d3r0c3:{num:"405",name:"内藤 大生",staff:"長広"},
+  d3r0c4:{num:"220",name:"銅木 彩人",staff:"奥田"},
+  // 3/5 row1
+  d3r1c0:{num:"202",name:"岩本 健太郎",staff:"堀口"},
+  d3r1c1:{num:"149",name:"鈴木 理久",staff:"澤中"},
+  d3r1c2:{num:"205",name:"保科 孝好",staff:"石田"},
+  d3r1c4:{num:"218",name:"山城 そよか",staff:"奥田"},
+  d3r1c7:{num:"121",name:"関口 真衣",staff:"長広"},
+  // 3/5 row2
+  d3r2c0:{num:"209",name:"伊藤 哲平",staff:"石田"},
+  d3r2c1:{num:"159",name:"建内 香子",staff:"堀口"},
+  d3r2c2:{num:"116",name:"相曽 友里花",staff:"長広"},
+  d3r2c7:{num:"117",name:"中尾 明日美",staff:"長広"},
+  // 3/5 row3
+  d3r3c0:{num:"226",name:"吉田 嵩",staff:"川﨑"},
+  d3r3c1:{num:"225",name:"吉田 真紀",staff:"奥田"},
+  d3r3c7:{num:"301",name:"溝呂木 優",staff:"遠藤(真)"},
+};
+
+// ============================================================
+//  STATE 初期化（4日×4行×8列 = 128セル）
+// ============================================================
+const states   = {};
+const cardData = {};
 function cid(d,r,c){ return `d${d}r${r}c${c}`; }
 
-DATES.forEach((date, di) => {
-  date.rows.forEach((row, ri) => {
-    row.cells.forEach((cell, ci) => {
-      const id = cid(di,ri,ci);
-      states[id] = 0;
-      cardData[id] = cell
-        ? { num: String(cell[0]), name: cell[1], staff: cell[2] }
-        : { num: "", name: "", staff: "" };
-    });
-  });
-});
+for (let d=0; d<MAX_DATES; d++)
+  for (let r=0; r<MAX_ROWS; r++)
+    for (let c=0; c<MAX_COLS; c++) {
+      const id = cid(d,r,c);
+      states[id]   = 0;
+      const init   = INITIAL_CARDS[id];
+      cardData[id] = init ? {...init} : {num:"",name:"",staff:""};
+    }
 
 // ============================================================
-//  BUILD UI
+//  UI構築
 // ============================================================
-function slotEnd(slot) {
-  const [h,m] = slot.split(':').map(Number);
-  const t = h*60+m+15;
-  return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
-}
+// slotEnd は廃止（slot がオブジェクト {start,end} になったため不要）
 
 function buildAll() {
   const tabsEl = document.getElementById('tabs');
   const secsEl = document.getElementById('sections');
+  tabsEl.innerHTML = '';
+  secsEl.innerHTML = '';
 
-  DATES.forEach((date, di) => {
+  for (let di=0; di<MAX_DATES; di++) {
+    const date = hdrData.dates[di];
+
     // Tab
     const tab = document.createElement('div');
     tab.className = 'tab' + (di===0?' on':'');
-    tab.textContent = date.label;
-    tab.onclick = () => switchDate(di);
+    tab.id = `tab${di}`;
+    tab.innerHTML = `<span class="tab-label">${date.label}</span><button class="tab-pen" onclick="event.stopPropagation();openHdrModal('date',${di},-1,-1)">✎</button>`;
+    tab.addEventListener('click', () => switchDate(di));
+    tab.addEventListener('touchend', (e) => {
+      if (e.target.classList.contains('tab-pen')) return;
+      e.preventDefault(); switchDate(di);
+    }, {passive:false});
     tabsEl.appendChild(tab);
 
     // Section
@@ -565,50 +628,83 @@ function buildAll() {
     const table = document.createElement('table');
     table.className = 'grid';
 
-    // Header row
+    // ヘッダー行（時間スロット）
     const thead = document.createElement('thead');
-    const tr0 = document.createElement('tr');
-    const corner = document.createElement('th');
-    corner.className = 'th-corner';
-    tr0.appendChild(corner);
+    const tr0   = document.createElement('tr');
+    tr0.appendChild(Object.assign(document.createElement('th'), {className:'th-corner'}));
 
-    SLOTS.forEach(slot => {
+    for (let ci=0; ci<MAX_COLS; ci++) {
       const th = document.createElement('th');
       th.className = 'th-time';
-      th.innerHTML = `${slot}<br><span style="opacity:.6;font-weight:400">〜${slotEnd(slot)}</span>`;
+      th.id = `thT_d${di}c${ci}`;
+      th.innerHTML = buildSlotHTML(date.slots[ci], di, ci);
       tr0.appendChild(th);
-    });
+    }
     thead.appendChild(tr0);
     table.appendChild(thead);
 
-    // Body rows
+    // 本体行（講師）
     const tbody = document.createElement('tbody');
-    date.rows.forEach((row, ri) => {
+    for (let ri=0; ri<MAX_ROWS; ri++) {
       const tr = document.createElement('tr');
 
-      // Row label (講師)
-      const tdLabel = document.createElement('td');
-      tdLabel.className = 'th-row';
-      tdLabel.textContent = row.label;
-      tr.appendChild(tdLabel);
+      const tdL = document.createElement('td');
+      tdL.className = 'th-row';
+      tdL.id = `thR_d${di}r${ri}`;
+      tdL.innerHTML = buildRowHTML(date.rows[ri].label, di, ri);
+      tr.appendChild(tdL);
 
-      SLOTS.forEach((_, ci) => {
-        const id = cid(di, ri, ci);
+      for (let ci=0; ci<MAX_COLS; ci++) {
         const td = document.createElement('td');
         td.className = 'td';
-        td.appendChild(makeCard(id));
+        td.appendChild(makeCard(cid(di,ri,ci)));
         tr.appendChild(td);
-      });
-
+      }
       tbody.appendChild(tr);
-    });
-
+    }
     table.appendChild(tbody);
     sec.appendChild(table);
     secsEl.appendChild(sec);
-  });
-
+  }
   updateStats();
+}
+
+function buildSlotHTML(slot, di, ci) {
+  // slot は {start, end} オブジェクト
+  return `${slot.start}<br><span style="opacity:.6;font-weight:400">〜${slot.end}</span>`
+    + `<button class="hdr-pen" data-type="slot" data-di="${di}" data-ci="${ci}" onclick="event.stopPropagation();openHdrModal('slot',${di},-1,${ci})">✎</button>`;
+}
+function buildRowHTML(label, di, ri) {
+  return `${label}`
+    + `<button class="hdr-pen" data-type="row" data-di="${di}" data-ri="${ri}" onclick="event.stopPropagation();openHdrModal('row',${di},${ri},-1)">✎</button>`;
+}
+
+// ─── 長押しユーティリティ ───
+function attachLongPress(el, onLong, onShortClick) {
+  let timer=null, longFired=false, lastTouch=0;
+  el.addEventListener('touchstart', ()=>{
+    longFired=false;
+    timer=setTimeout(()=>{ longFired=true; onLong(); }, 700);
+  }, {passive:true});
+  el.addEventListener('touchmove',  ()=>clearTimeout(timer), {passive:true});
+  el.addEventListener('touchend', (e)=>{
+    clearTimeout(timer);
+    lastTouch=Date.now();
+    if (!longFired && onShortClick) { e.preventDefault(); onShortClick(); }
+    longFired=false;
+  }, {passive:false});
+  el.addEventListener('touchcancel', ()=>{ clearTimeout(timer); longFired=false; }, {passive:true});
+  el.addEventListener('mousedown', ()=>{
+    if(Date.now()-lastTouch>500){ longFired=false; timer=setTimeout(()=>{ longFired=true; onLong(); },700); }
+  });
+  el.addEventListener('mousemove',  ()=>clearTimeout(timer));
+  el.addEventListener('mouseup',    ()=>clearTimeout(timer));
+  el.addEventListener('mouseleave', ()=>clearTimeout(timer));
+  if (onShortClick) {
+    el.addEventListener('click', ()=>{
+      if(Date.now()-lastTouch>500 && !longFired) onShortClick();
+    });
+  }
 }
 
 function makeCard(id) {
@@ -617,22 +713,15 @@ function makeCard(id) {
   const empty = !d.name && !d.num;
 
   const card = document.createElement('div');
-  card.className = 'card' + (empty ? ' empty' : '');
+  card.className = 'card' + (empty?' empty':'');
   card.dataset.s = s;
   card.dataset.id = id;
 
   if (empty) {
     card.textContent = '＋';
-    // 空セルはタッチ・クリック両方でモーダルを開く（二重防止付き）
-    let emptyLastTouch = 0;
-    card.addEventListener('touchend', (e) => {
-      e.preventDefault(); // clickの二重発火を防ぐ
-      emptyLastTouch = Date.now();
-      openModal(id);
-    }, { passive: false });
-    card.addEventListener('click', () => {
-      if (Date.now() - emptyLastTouch > 500) openModal(id);
-    });
+    let lt=0;
+    card.addEventListener('touchend', (e)=>{ e.preventDefault(); lt=Date.now(); openModal(id); }, {passive:false});
+    card.addEventListener('click', ()=>{ if(Date.now()-lt>500) openModal(id); });
     return card;
   }
 
@@ -642,62 +731,29 @@ function makeCard(id) {
       <div class="c-name">${d.name}</div>
       <div class="c-staff">${d.staff}</div>
     </div>
-    <div class="c-dot"></div>
-  `;
+    <div class="c-dot"></div>`;
 
-  // ─── タッチ操作 ───
-  // iPad では touchend → click の二重発火が起きるため、
-  // タッチ系と mouse/click 系を完全に分離し、
-  // touchend で e.preventDefault() して click を抑制する。
-  let pressTimer = null;
-  let longPressed = false;
-  let touchMoved = false;
-  let lastTouchEnd = 0;
+  let pressTimer=null, longPressed=false, touchMoved=false, lastTouchEnd=0;
 
-  card.addEventListener('touchstart', (e) => {
-    longPressed = false;
-    touchMoved = false;
-    pressTimer = setTimeout(() => {
-      longPressed = true;
-      openModal(id);
-    }, 600);
-  }, { passive: true });
+  card.addEventListener('touchstart', ()=>{ longPressed=false; touchMoved=false;
+    pressTimer=setTimeout(()=>{ longPressed=true; openModal(id); },600); }, {passive:true});
+  card.addEventListener('touchmove', ()=>{ touchMoved=true; clearTimeout(pressTimer); }, {passive:true});
+  card.addEventListener('touchcancel', ()=>{ clearTimeout(pressTimer); longPressed=false; }, {passive:true});
+  card.addEventListener('touchend', (e)=>{
+    e.preventDefault(); clearTimeout(pressTimer); lastTouchEnd=Date.now();
+    if (!longPressed&&!touchMoved) advance(id);
+    longPressed=false; touchMoved=false;
+  }, {passive:false});
 
-  card.addEventListener('touchmove', () => {
-    touchMoved = true;
-    clearTimeout(pressTimer);
-  }, { passive: true });
-
-  card.addEventListener('touchcancel', () => {
-    clearTimeout(pressTimer);
-    longPressed = false;
-  }, { passive: true });
-
-  card.addEventListener('touchend', (e) => {
-    e.preventDefault(); // ← これがキモ：click の二重発火を完全に防ぐ
-    clearTimeout(pressTimer);
-    lastTouchEnd = Date.now();
-    if (!longPressed && !touchMoved) {
-      advance(id); // タップ → 状態を1つ進める
-    }
-    longPressed = false;
-    touchMoved = false;
-  }, { passive: false }); // preventDefault を使うので passive:false
-
-  // マウス用（PC）：タッチ操作後 500ms 以内は無視して二重実行を防ぐ
-  card.addEventListener('mousedown', () => {
-    if (Date.now() - lastTouchEnd < 500) return;
-    longPressed = false;
-    pressTimer = setTimeout(() => {
-      longPressed = true;
-      openModal(id);
-    }, 600);
+  card.addEventListener('mousedown', ()=>{
+    if(Date.now()-lastTouchEnd<500) return;
+    longPressed=false; pressTimer=setTimeout(()=>{ longPressed=true; openModal(id); },600);
   });
-  card.addEventListener('mouseup', () => { clearTimeout(pressTimer); });
-  card.addEventListener('mouseleave', () => { clearTimeout(pressTimer); });
-  card.addEventListener('click', () => {
-    if (Date.now() - lastTouchEnd < 500) return; // タッチ後はスキップ
-    if (!longPressed) advance(id);
+  card.addEventListener('mouseup', ()=>clearTimeout(pressTimer));
+  card.addEventListener('mouseleave', ()=>clearTimeout(pressTimer));
+  card.addEventListener('click', ()=>{
+    if(Date.now()-lastTouchEnd<500) return;
+    if(!longPressed) advance(id);
   });
 
   return card;
@@ -705,8 +761,26 @@ function makeCard(id) {
 
 function refreshCard(id) {
   const el = document.querySelector(`.card[data-id="${id}"]`);
-  if (!el) return;
-  el.parentNode.replaceChild(makeCard(id), el);
+  if (el) el.parentNode.replaceChild(makeCard(id), el);
+}
+
+function refreshHeaderUI() {
+  for (let di=0; di<MAX_DATES; di++) {
+    const date = hdrData.dates[di];
+    // タブ
+    const tabEl = document.getElementById(`tab${di}`);
+    if (tabEl) { const l=tabEl.querySelector('.tab-label'); if(l) l.textContent=date.label; }
+    // 時間スロット
+    for (let ci=0; ci<MAX_COLS; ci++) {
+      const th = document.getElementById(`thT_d${di}c${ci}`);
+      if (th) { th.innerHTML = buildSlotHTML(date.slots[ci], di, ci); }
+    }
+    // 講師行
+    for (let ri=0; ri<MAX_ROWS; ri++) {
+      const td = document.getElementById(`thR_d${di}r${ri}`);
+      if (td) { td.innerHTML = buildRowHTML(date.rows[ri].label, di, ri); }
+    }
+  }
 }
 
 function advance(id) {
@@ -714,13 +788,12 @@ function advance(id) {
   const el = document.querySelector(`.card[data-id="${id}"]`);
   if (el) el.dataset.s = states[id];
   updateStats();
-  // Firebase に即時書き込み → 他端末にリアルタイム反映
   update(dbRef, { [id]: states[id] });
 }
 
 function switchDate(di) {
-  document.querySelectorAll('.tab').forEach((t,i)=> t.classList.toggle('on', i===di));
-  document.querySelectorAll('.sec').forEach((s,i)=> s.classList.toggle('on', i===di));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===di));
+  document.querySelectorAll('.sec').forEach((s,i)=>s.classList.toggle('on',i===di));
 }
 
 function updateStats() {
@@ -732,164 +805,324 @@ function updateStats() {
 
 function confirmReset() {
   if (!confirm('全カードの状態をリセットしますか？')) return;
-  const allZero = {};
-  Object.keys(states).forEach(id => { states[id]=0; allZero[id]=0; });
-  document.querySelectorAll('.card').forEach(c => c.dataset.s=0);
+  const allZero={};
+  Object.keys(states).forEach(id=>{ states[id]=0; allZero[id]=0; });
+  document.querySelectorAll('.card').forEach(c=>c.dataset.s=0);
   updateStats();
-  // Firebase に一括書き込み
   set(dbRef, allZero);
 }
 
-// ─── MODAL ───
+// ─── カード編集モーダル ───
 let editId=null, mState=0;
 
 function openModal(id) {
-  editId = id;
-  const d = cardData[id];
+  editId=id;
+  const d=cardData[id];
   document.getElementById('mNum').value   = d.num;
   document.getElementById('mName').value  = d.name;
   document.getElementById('mStaff').value = d.staff;
-  mState = states[id];
-  refreshSBtns();
+  mState=states[id]; refreshSBtns();
   document.getElementById('overlay').classList.add('on');
-  setTimeout(()=>document.getElementById('mName').focus(), 80);
+  setTimeout(()=>document.getElementById('mName').focus(),80);
 }
-
 function closeModal() {
-  document.getElementById('overlay').classList.remove('on');
-  editId = null;
+  document.getElementById('overlay').classList.remove('on'); editId=null;
 }
-
-function pickState(s) { mState=s; refreshSBtns(); }
-
+function pickState(s){ mState=s; refreshSBtns(); }
 function refreshSBtns() {
-  document.querySelectorAll('.sb').forEach(b => {
-    b.classList.toggle('on', parseInt(b.dataset.s)===mState);
-  });
+  document.querySelectorAll('.sb').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.s)===mState));
 }
-
 function saveModal() {
   if (!editId) return;
-  cardData[editId] = {
-    num:   document.getElementById('mNum').value.trim(),
-    name:  document.getElementById('mName').value.trim(),
-    staff: document.getElementById('mStaff').value.trim(),
-  };
-  states[editId] = mState;
-  refreshCard(editId);
-  updateStats();
-  // 状態 + カードデータ（氏名・番号・担当）を Firebase に書き込み → 全端末に同期
+  cardData[editId]={ num:document.getElementById('mNum').value.trim(),
+    name:document.getElementById('mName').value.trim(),
+    staff:document.getElementById('mStaff').value.trim() };
+  states[editId]=mState;
+  refreshCard(editId); updateStats();
   update(dbRef,   { [editId]: states[editId] });
   update(cardRef, { [editId]: cardData[editId] });
   closeModal();
 }
 
+// ─── ヘッダー編集モーダル ───
+let hdrType=null, hdrDi=-1, hdrRi=-1, hdrCi=-1;
+
+window.openHdrModal = function openHdrModal(type,di,ri,ci) {
+  hdrType=type; hdrDi=di; hdrRi=ri; hdrCi=ci;
+  let title, label, value;
+  if (type==='date') {
+    title='📅 日付を編集'; label='日付ラベル（例: 3/2（月））';
+    value=hdrData.dates[di].label;
+  } else if (type==='slot') {
+    title='🕐 時間スロットを編集'; label='開始時刻（例: 19:00）';
+    value=hdrData.dates[di].slots[ci].start;
+  } else {
+    title='👤 講師名を編集'; label='講師名';
+    value=hdrData.dates[di].rows[ri].label;
+  }
+  document.getElementById('hdrTitle').textContent = title;
+  document.getElementById('hdrLabel').textContent = label;
+  document.getElementById('hdrInput').value = value;
+  // slot のみ終了時刻フィールドを表示
+  const endWrap = document.getElementById('hdrEndWrap');
+  if (type==='slot') {
+    endWrap.style.display = '';
+    document.getElementById('hdrEndInput').value = hdrData.dates[di].slots[ci].end;
+  } else {
+    endWrap.style.display = 'none';
+  }
+  document.getElementById('hdrOverlay').classList.add('on');
+  setTimeout(()=>document.getElementById('hdrInput').focus(),80);
+}
+function closeHdrModal() {
+  document.getElementById('hdrOverlay').classList.remove('on');
+}
+function saveHdrModal() {
+  const val = document.getElementById('hdrInput').value.trim();
+  if (!val) return;
+  if (hdrType==='date') {
+    hdrData.dates[hdrDi].label = val;
+  } else if (hdrType==='slot') {
+    const endVal = document.getElementById('hdrEndInput').value.trim();
+    hdrData.dates[hdrDi].slots[hdrCi] = { start: val, end: endVal || val };
+  } else {
+    hdrData.dates[hdrDi].rows[hdrRi].label = val;
+  }
+  refreshHeaderUI();
+  set(hdrRef, hdrData);  // Firebase に同期
+  closeHdrModal();
+}
+
+// ─── Excel インポート ───
+let excelRows = null;
+
+function openExcelModal() {
+  excelRows=null;
+  document.getElementById('excelPreview').classList.remove('on');
+  document.getElementById('excelApply').disabled=true;
+  document.getElementById('excelFileInput').value='';
+  document.getElementById('excelOverlay').classList.add('on');
+}
+function closeExcelModal() {
+  document.getElementById('excelOverlay').classList.remove('on');
+}
+
+function handleExcelFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const wb   = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+      const ws   = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+      const data = rows.slice(1).filter(r=>String(r[1]||'').trim());
+
+      document.getElementById('excelPreviewTitle').textContent =
+        `${file.name}  ─  ${data.length} 件検出`;
+      document.getElementById('excelPreviewRows').innerHTML =
+        data.slice(0,6).map(r=>
+          `<div class="excel-preview-row">
+            <span style="min-width:38px;color:#1d4ed8;font-weight:700">${r[0]||''}</span>
+            <span style="min-width:90px;font-weight:600">${r[1]||''}</span>
+            <span style="min-width:64px;color:#6b7280">${r[2]||''}</span>
+            <span style="min-width:64px;color:#059669">${r[3]||''}</span>
+            <span style="min-width:44px;color:#7c3aed">${r[4]||''}</span>
+            <span style="color:#b45309">${r[5]||''}</span>
+          </div>`
+        ).join('') + (data.length>6 ? `<div style="color:#9ca3af;padding-top:4px">… 他${data.length-6}件</div>` : '');
+
+      document.getElementById('excelPreview').classList.add('on');
+      excelRows = data;
+      document.getElementById('excelApply').disabled = false;
+    } catch(err) {
+      alert('読み込み失敗: '+err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function applyExcelData() {
+  if (!excelRows) return;
+  const updated={};
+  let notFound=0;
+  let hdrChanged=false;
+
+  excelRows.forEach(r=>{
+    const num=String(r[0]||'').trim(), name=String(r[1]||'').trim(),
+          stf=String(r[2]||'').trim(), dateL=String(r[3]||'').trim(),
+          slotL=String(r[4]||'').trim(), rowL=String(r[5]||'').trim(),
+          newDateL=String(r[6]||'').trim(), newSlotL=String(r[7]||'').trim();
+    if (!name) return;
+
+    const di = hdrData.dates.findIndex(d=>d.label===dateL);
+    if (di<0) {
+      // 日付が見つからない → 既存カードを番号＋氏名で検索
+      const existId = Object.keys(cardData).find(id=>
+        cardData[id].num===num && cardData[id].name===name);
+      if (existId) { cardData[existId]={num,name,staff:stf}; updated[existId]={num,name,staff:stf}; }
+      else notFound++;
+      return;
+    }
+
+    // G列: 日付ラベルの更新
+    if (newDateL && newDateL !== hdrData.dates[di].label) {
+      hdrData.dates[di].label = newDateL;
+      hdrChanged = true;
+    }
+
+    const ci = hdrData.dates[di].slots.findIndex(s=>(s.start||s)===slotL);
+    const ri = hdrData.dates[di].rows.findIndex(row=>row.label===rowL);
+
+    // H列: スロットラベルの更新
+    if (newSlotL && ci>=0 && newSlotL !== hdrData.dates[di].slots[ci].start) {
+      hdrData.dates[di].slots[ci] = { start: newSlotL, end: newSlotL };
+      hdrChanged = true;
+    }
+
+    if (ci>=0 && ri>=0) {
+      const id=cid(di,ri,ci);
+      cardData[id]={num,name,staff:stf}; updated[id]={num,name,staff:stf};
+    } else notFound++;
+  });
+
+  Object.keys(updated).forEach(id=>refreshCard(id));
+  updateStats();
+  if (Object.keys(updated).length>0) update(cardRef, updated);
+  if (hdrChanged) { refreshHeaderUI(); set(hdrRef, hdrData); }
+  closeExcelModal();
+  alert(`${Object.keys(updated).length}件を反映しました。`+(notFound>0?`\n（${notFound}件は位置特定できず未反映）`:'')+(hdrChanged?`\nヘッダーも更新しました。`:''));
+}
 
 // ============================================================
-//  モーダル・ボタンのイベント登録（type=module対応）
+//  イベント登録
 // ============================================================
 function setupEvents() {
-  // 戻るボタン
-  document.querySelector('.mbtn.cancel').addEventListener('click', closeModal);
-  document.querySelector('.mbtn.cancel').addEventListener('touchend', (e)=>{ e.preventDefault(); closeModal(); });
+  // カードモーダル
+  const reg=(id,fn)=>{
+    const el=document.getElementById(id);
+    el.addEventListener('click',fn);
+    el.addEventListener('touchend',(e)=>{e.preventDefault();fn();});
+  };
+  reg('cardCancel', closeModal);
+  reg('cardSave',   saveModal);
 
-  // 保存ボタン
-  document.querySelector('.mbtn.save').addEventListener('click', saveModal);
-  document.querySelector('.mbtn.save').addEventListener('touchend', (e)=>{ e.preventDefault(); saveModal(); });
-
-  // 状態選択ボタン
-  document.querySelectorAll('.sb[data-pick]').forEach(btn => {
-    const s = parseInt(btn.dataset.pick);
-    btn.addEventListener('click', () => pickState(s));
-    btn.addEventListener('touchend', (e)=>{ e.preventDefault(); pickState(s); });
+  document.querySelectorAll('.sb[data-pick]').forEach(btn=>{
+    const s=parseInt(btn.dataset.pick);
+    btn.addEventListener('click',()=>pickState(s));
+    btn.addEventListener('touchend',(e)=>{e.preventDefault();pickState(s);});
   });
 
-  // 全リセットボタン
-  const resetBtn = document.getElementById('btnReset');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', confirmReset);
-    resetBtn.addEventListener('touchend', (e)=>{ e.preventDefault(); confirmReset(); });
-  }
+  reg('btnReset', confirmReset);
 
-  // オーバーレイ外タップで閉じる
-  document.getElementById('overlay').addEventListener('click', e => {
-    if (e.target === document.getElementById('overlay')) closeModal();
+  document.getElementById('overlay').addEventListener('click',e=>{
+    if(e.target===document.getElementById('overlay')) closeModal();
   });
 
-  // キーボード
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeModal();
+  // ヘッダーモーダル
+  reg('hdrCancel', closeHdrModal);
+  reg('hdrSave',   saveHdrModal);
+  document.getElementById('hdrOverlay').addEventListener('click',e=>{
+    if(e.target===document.getElementById('hdrOverlay')) closeHdrModal();
+  });
+  ['hdrInput','hdrEndInput'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown',e=>{
+      if(e.key==='Enter') saveHdrModal();
+      if(e.key==='Escape') closeHdrModal();
+    });
+  });
+
+  // Excelモーダル
+  reg('btnImport',   openExcelModal);
+  reg('excelCancel', closeExcelModal);
+  reg('excelApply',  applyExcelData);
+
+  document.getElementById('excelOverlay').addEventListener('click',e=>{
+    if(e.target===document.getElementById('excelOverlay')) closeExcelModal();
+  });
+
+  const drop=document.getElementById('excelDrop');
+  const fi  =document.getElementById('excelFileInput');
+  drop.addEventListener('click',()=>fi.click());
+  fi.addEventListener('change',e=>{ if(e.target.files[0]) handleExcelFile(e.target.files[0]); });
+  drop.addEventListener('dragover', e=>{e.preventDefault();drop.classList.add('drag');});
+  drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
+  drop.addEventListener('drop', e=>{
+    e.preventDefault(); drop.classList.remove('drag');
+    if(e.dataTransfer.files[0]) handleExcelFile(e.dataTransfer.files[0]);
+  });
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){ closeModal(); closeHdrModal(); closeExcelModal(); }
   });
 }
+
 // ============================================================
-//  Firebase リアルタイム受信
-//  他端末の変更を受け取り、自分の画面に反映する
+//  Firebase リアルタイム同期
 // ============================================================
 let fbInitialized = false;
 
-// cardData（氏名・番号・担当）のリアルタイム同期
-onValue(cardRef, (snapshot) => {
-  const remoteCards = snapshot.val() || {};
-  Object.keys(remoteCards).forEach(id => {
-    if (cardData[id] !== undefined) {
-      const prev = cardData[id];
-      const next = remoteCards[id];
-      // 変更があればカードを再描画
-      if (prev.name !== next.name || prev.num !== next.num || prev.staff !== next.staff) {
-        cardData[id] = next;
+// ヘッダー同期
+onValue(hdrRef, snap=>{
+  const rh = snap.val();
+  if (rh && rh.dates) {
+    // 旧形式（slots が文字列配列）との後方互換
+    rh.dates.forEach(d => {
+      if (d.slots) d.slots = d.slots.map(s =>
+        (typeof s === 'string') ? {start:s, end:s} : s
+      );
+    });
+    hdrData = rh;
+    if (fbInitialized) refreshHeaderUI();
+  }
+});
+
+// cardData 同期
+onValue(cardRef, snap=>{
+  const rc = snap.val()||{};
+  Object.keys(rc).forEach(id=>{
+    if (cardData[id]!==undefined) {
+      const p=cardData[id], n=rc[id];
+      if (p.name!==n.name||p.num!==n.num||p.staff!==n.staff) {
+        cardData[id]=n;
         if (fbInitialized) refreshCard(id);
       }
     }
   });
 });
 
-onValue(dbRef, (snapshot) => {
-  const remote = snapshot.val() || {};
+// states 同期（初回buildAll含む）
+onValue(dbRef, snap=>{
+  const remote = snap.val()||{};
+  Object.keys(remote).forEach(id=>{ if(states[id]!==undefined) states[id]=remote[id]; });
 
-  // 初回ロード時：Firebaseの状態でローカルを上書き
-  Object.keys(remote).forEach(id => {
-    if (states[id] !== undefined) {
-      states[id] = remote[id];
-    }
-  });
-
-  // 初回のみ buildAll を呼び出す（以降は差分更新）
   if (!fbInitialized) {
-    fbInitialized = true;
-    buildAll();
-    setupEvents();
-    setConnected(true);
+    fbInitialized=true;
+    buildAll(); setupEvents(); setConnected(true);
     return;
   }
-
-  // 2回目以降：差分をカードに反映
-  Object.keys(remote).forEach(id => {
-    if (states[id] !== undefined) {
-      const el = document.querySelector(`.card[data-id="${id}"]`);
-      if (el && parseInt(el.dataset.s) !== remote[id]) {
-        states[id] = remote[id];
-        el.dataset.s = remote[id];
+  Object.keys(remote).forEach(id=>{
+    if (states[id]!==undefined) {
+      const el=document.querySelector(`.card[data-id="${id}"]`);
+      if (el && parseInt(el.dataset.s)!==remote[id]) {
+        states[id]=remote[id]; el.dataset.s=remote[id];
       }
     }
   });
   updateStats();
 });
 
-// 接続状態インジケーター
-const connRef = ref(db, '.info/connected');
-onValue(connRef, (snap) => { setConnected(snap.val() === true); });
+// 接続インジケーター
+onValue(ref(db,'.info/connected'), snap=>setConnected(snap.val()===true));
 
 function setConnected(ok) {
-  const el = document.getElementById('connDot');
+  const el=document.getElementById('connDot');
   if (!el) return;
-  el.style.background = ok ? '#22c55e' : '#ef4444';
-  el.title = ok ? '接続中' : '接続切断';
+  el.style.background = ok?'#22c55e':'#ef4444';
+  el.title = ok?'接続中':'接続切断';
 }
 
-// Firebase 接続前のフォールバック（3秒後も未初期化なら通常起動）
-setTimeout(() => {
-  if (!fbInitialized) { fbInitialized = true; buildAll(); setupEvents(); }
-}, 3000);
+// フォールバック
+setTimeout(()=>{ if(!fbInitialized){ fbInitialized=true; buildAll(); setupEvents(); } },3000);
 </script>
 </body>
 </html>
