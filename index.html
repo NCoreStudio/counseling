@@ -61,6 +61,59 @@ body { display: flex; flex-direction: column; }
   padding: 8px 13px; font-size: .78rem; font-weight: 700; font-family: inherit;
   cursor: pointer; touch-action: manipulation; white-space: nowrap;
 }
+#btnPrint {
+  background: #7c3aed; color: #fff; border: none; border-radius: 8px;
+  padding: 8px 13px; font-size: .78rem; font-weight: 700; font-family: inherit;
+  cursor: pointer; touch-action: manipulation; white-space: nowrap;
+}
+/* タッチデバイス（iPad等）ではPC専用ボタンを非表示 */
+@media (hover: none) {
+  .pc-only { display: none !important; }
+}
+/* ─── 印刷スタイル ─── */
+@media print {
+  @page { size: A4 landscape; margin: 8mm; }
+  html, body {
+    height: auto !important; overflow: visible !important;
+    background: #fff !important; color: #000 !important;
+  }
+  #topbar, #tabs, #legend { display: none !important; }
+  #scroller { overflow: visible !important; flex: none !important; padding: 0 !important; }
+  #sections { overflow: visible !important; }
+  .sec { display: none !important; }
+  .sec.print-target { display: block !important; }
+  table.grid { border-spacing: 2px !important; width: 100% !important; table-layout: fixed !important; }
+  .th-corner { min-width: 40px !important; width: 40px !important; }
+  .th-time {
+    min-width: 0 !important; width: auto !important; height: 28px !important;
+    background: #1e3a5f !important; color: #fff !important;
+    font-size: .55rem !important; padding: 2px !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .th-row {
+    min-width: 40px !important; width: 40px !important; height: auto !important;
+    background: #1e3a5f !important; color: #fff !important;
+    font-size: .6rem !important; padding: 2px !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .td { min-width: 0 !important; width: auto !important; height: 54px !important; }
+  .card {
+    min-height: 54px !important; border-width: 1px !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .card.empty { border-color: #e5e7eb !important; background: #f9fafb !important; color: #ccc !important; }
+  .c-num { width: 26px !important; min-width: 26px !important; font-size: .6rem !important; }
+  .c-name { font-size: .65rem !important; }
+  .c-staff { font-size: .55rem !important; }
+  .hdr-pen, .tab-pen { display: none !important; }
+  #print-header { display: block !important; }
+}
+#print-header {
+  display: none;
+  font-size: .9rem; font-weight: 700; color: #0f172a;
+  margin-bottom: 6px; padding-bottom: 4px;
+  border-bottom: 2px solid #0f172a;
+}
 
 /* ─── TABS ─── */
 #tabs {
@@ -305,8 +358,9 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
     <div class="pill p2">②中 <b id="s2">0</b></div>
     <div class="pill p3">③終了 <b id="s3">0</b></div>
   </div>
-  <button id="btnImport">📥 Excel取込</button>
-  <button id="btnReset">全リセット</button>
+  <button id="btnImport"  class="pc-only">📥 Excel取込</button>
+  <button id="btnPrint"   class="pc-only">🖨️ 印刷</button>
+  <button id="btnReset"   class="pc-only">全リセット</button>
 </div>
 
 <div id="tabs"></div>
@@ -319,7 +373,7 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
   <div class="leghint">タップ→状態変更　長押し→編集</div>
 </div>
 
-<div id="scroller"><div id="sections"></div></div>
+<div id="scroller"><div id="print-header"></div><div id="sections"></div></div>
 
 <!-- ① カード編集モーダル -->
 <div id="overlay" class="overlay-base">
@@ -707,24 +761,32 @@ function attachLongPress(el, onLong, onShortClick) {
   }
 }
 
+// PC判定（マウスが使えるデバイス = hover:hover）
+const isPC = window.matchMedia('(hover: hover)').matches;
+
 function makeCard(id) {
   const d = cardData[id];
   const s = states[id];
   const empty = !d.name && !d.num;
 
   const card = document.createElement('div');
-  card.className = 'card' + (empty?' empty':'');
   card.dataset.s = s;
   card.dataset.id = id;
 
   if (empty) {
+    card.className = 'card empty';
     card.textContent = '＋';
-    let lt=0;
-    card.addEventListener('touchend', (e)=>{ e.preventDefault(); lt=Date.now(); openModal(id); }, {passive:false});
-    card.addEventListener('click', ()=>{ if(Date.now()-lt>500) openModal(id); });
+    if (isPC) {
+      // PCのみ：クリック・タッチで編集モーダル
+      let lt=0;
+      card.addEventListener('touchend', (e)=>{ e.preventDefault(); lt=Date.now(); openModal(id); }, {passive:false});
+      card.addEventListener('click', ()=>{ if(Date.now()-lt>500) openModal(id); });
+    }
+    // タッチデバイス：何もしない（＋表示のみ）
     return card;
   }
 
+  card.className = 'card';
   card.innerHTML = `
     <div class="c-num">${d.num}</div>
     <div class="c-body">
@@ -735,8 +797,11 @@ function makeCard(id) {
 
   let pressTimer=null, longPressed=false, touchMoved=false, lastTouchEnd=0;
 
-  card.addEventListener('touchstart', ()=>{ longPressed=false; touchMoved=false;
-    pressTimer=setTimeout(()=>{ longPressed=true; openModal(id); },600); }, {passive:true});
+  // タッチ操作（iPad等）：タップのみ状態変更、長押し編集は無効
+  card.addEventListener('touchstart', ()=>{
+    longPressed=false; touchMoved=false;
+    if (isPC) pressTimer=setTimeout(()=>{ longPressed=true; openModal(id); },600);
+  }, {passive:true});
   card.addEventListener('touchmove', ()=>{ touchMoved=true; clearTimeout(pressTimer); }, {passive:true});
   card.addEventListener('touchcancel', ()=>{ clearTimeout(pressTimer); longPressed=false; }, {passive:true});
   card.addEventListener('touchend', (e)=>{
@@ -745,6 +810,7 @@ function makeCard(id) {
     longPressed=false; touchMoved=false;
   }, {passive:false});
 
+  // マウス操作（PC）：クリック→状態変更、長押し→編集モーダル
   card.addEventListener('mousedown', ()=>{
     if(Date.now()-lastTouchEnd<500) return;
     longPressed=false; pressTimer=setTimeout(()=>{ longPressed=true; openModal(id); },600);
@@ -994,6 +1060,30 @@ function applyExcelData() {
 }
 
 // ============================================================
+//  印刷
+// ============================================================
+function printCurrentDate() {
+  // 現在表示中のタブインデックスを取得
+  const activeSec = document.querySelector('.sec.on');
+  if (!activeSec) return;
+  const di = parseInt(activeSec.id.replace('sec',''));
+  const dateLabel = hdrData.dates[di].label;
+
+  // print-target クラスを付け替え
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('print-target'));
+  activeSec.classList.add('print-target');
+
+  // 印刷ヘッダーにタイトル設定
+  const ph = document.getElementById('print-header');
+  ph.textContent = `カウンセリング日程　${dateLabel}`;
+
+  window.print();
+
+  // 後処理
+  activeSec.classList.remove('print-target');
+}
+
+// ============================================================
 //  イベント登録
 // ============================================================
 function setupEvents() {
@@ -1013,6 +1103,7 @@ function setupEvents() {
   });
 
   reg('btnReset', confirmReset);
+  reg('btnPrint', printCurrentDate);
 
   document.getElementById('overlay').addEventListener('click',e=>{
     if(e.target===document.getElementById('overlay')) closeModal();
