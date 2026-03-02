@@ -56,7 +56,6 @@ body { display: flex; flex-direction: column; }
   cursor: pointer; touch-action: manipulation; white-space: nowrap;
 }
 #btnReset {
-  margin-left: auto;
   background: #dc2626; color: #fff; border: none; border-radius: 8px;
   padding: 8px 13px; font-size: .78rem; font-weight: 700; font-family: inherit;
   cursor: pointer; touch-action: manipulation; white-space: nowrap;
@@ -66,10 +65,54 @@ body { display: flex; flex-direction: column; }
   padding: 8px 13px; font-size: .78rem; font-weight: 700; font-family: inherit;
   cursor: pointer; touch-action: manipulation; white-space: nowrap;
 }
-/* タッチデバイス（iPad等）ではPC専用ボタンを非表示 */
+#btnEditMode {
+  margin-left: auto;
+  background: #1e293b; color: #64748b;
+  border: 1.5px solid #334155; border-radius: 8px;
+  padding: 8px 13px; font-size: .78rem; font-weight: 700; font-family: inherit;
+  cursor: pointer; touch-action: manipulation; white-space: nowrap;
+  transition: background .2s, color .2s, border-color .2s;
+}
+#btnEditMode.active { background: #d97706; color: #fff; border-color: #d97706; }
+
+/* 編集モードOFF時は .edit-only を非表示 */
+.edit-only { display: none !important; }
+body.edit-mode .edit-only { display: inline-flex !important; }
+/* tab-pen は inline-block */
+body.edit-mode .tab.on .tab-pen { display: inline-block !important; }
+
+/* PC専用（印刷）*/
 @media (hover: none) {
   .pc-only { display: none !important; }
 }
+
+/* ─── パスワードモーダル ─── */
+#pwOverlay { z-index: 2000; }
+.pw-modal {
+  background: #1e293b; border-radius: 18px; padding: 28px 22px;
+  width: 100%; max-width: 300px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.7);
+  text-align: center;
+}
+.pw-modal h3 { color: #f1f5f9; font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+.pw-modal p  { color: #64748b; font-size: .75rem; margin-bottom: 18px; }
+.pw-input {
+  width: 100%; padding: 14px; text-align: center; letter-spacing: .4em;
+  font-size: 1.4rem; font-weight: 700; font-family: inherit;
+  border: 2px solid #334155; border-radius: 10px;
+  background: #0f172a; color: #f1f5f9; outline: none;
+  -webkit-appearance: none; margin-bottom: 8px;
+}
+.pw-input:focus { border-color: #38bdf8; }
+.pw-error { color: #f87171; font-size: .75rem; min-height: 18px; margin-bottom: 10px; }
+.pw-actions { display: flex; gap: 10px; }
+.pw-btn {
+  flex: 1; padding: 13px; border: none; border-radius: 10px;
+  font-family: inherit; font-size: .9rem; font-weight: 700;
+  cursor: pointer; touch-action: manipulation;
+}
+.pw-btn.cancel { background: #334155; color: #94a3b8; }
+.pw-btn.ok     { background: #2563eb; color: #fff; }
 /* ─── 印刷スタイル ─── */
 @media print {
   @page { size: A4 landscape; margin: 8mm; }
@@ -358,9 +401,10 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
     <div class="pill p2">②中 <b id="s2">0</b></div>
     <div class="pill p3">③終了 <b id="s3">0</b></div>
   </div>
-  <button id="btnImport"  class="pc-only">📥 Excel取込</button>
-  <button id="btnPrint"   class="pc-only">🖨️ 印刷</button>
-  <button id="btnReset"   class="pc-only">全リセット</button>
+  <button id="btnEditMode">🔒 編集モード</button>
+  <button id="btnImport" class="edit-only">📥 Excel取込</button>
+  <button id="btnPrint"  class="pc-only">🖨️ 印刷</button>
+  <button id="btnReset"  class="edit-only">全リセット</button>
 </div>
 
 <div id="tabs"></div>
@@ -374,6 +418,20 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
 </div>
 
 <div id="scroller"><div id="print-header"></div><div id="sections"></div></div>
+
+<!-- パスワードモーダル -->
+<div id="pwOverlay" class="overlay-base">
+  <div class="pw-modal">
+    <h3>🔑 編集モード</h3>
+    <p>パスワードを入力してください</p>
+    <input class="pw-input" id="pwInput" type="password" inputmode="numeric" maxlength="10" placeholder="・・・・">
+    <div class="pw-error" id="pwError"></div>
+    <div class="pw-actions">
+      <button class="pw-btn cancel" id="pwCancel">キャンセル</button>
+      <button class="pw-btn ok"     id="pwOk">ロック解除</button>
+    </div>
+  </div>
+</div>
 
 <!-- ① カード編集モーダル -->
 <div id="overlay" class="overlay-base">
@@ -763,6 +821,8 @@ function attachLongPress(el, onLong, onShortClick) {
 
 // PC判定（マウスが使えるデバイス = hover:hover）
 const isPC = window.matchMedia('(hover: hover)').matches;
+// 編集モードフラグ（パスワード認証後にtrue）
+let isEditMode = false;
 
 function makeCard(id) {
   const d = cardData[id];
@@ -776,13 +836,13 @@ function makeCard(id) {
   if (empty) {
     card.className = 'card empty';
     card.textContent = '＋';
-    if (isPC) {
-      // PCのみ：クリック・タッチで編集モーダル
+    if (isEditMode) {
+      // 編集モードのみ：クリック・タッチで編集モーダル
       let lt=0;
       card.addEventListener('touchend', (e)=>{ e.preventDefault(); lt=Date.now(); openModal(id); }, {passive:false});
       card.addEventListener('click', ()=>{ if(Date.now()-lt>500) openModal(id); });
     }
-    // タッチデバイス：何もしない（＋表示のみ）
+    // 通常モード：何もしない（＋表示のみ）
     return card;
   }
 
@@ -800,7 +860,7 @@ function makeCard(id) {
   // タッチ操作（iPad等）：タップのみ状態変更、長押し編集は無効
   card.addEventListener('touchstart', ()=>{
     longPressed=false; touchMoved=false;
-    if (isPC) pressTimer=setTimeout(()=>{ longPressed=true; openModal(id); },600);
+    if (isEditMode) pressTimer=setTimeout(()=>{ longPressed=true; openModal(id); },600);
   }, {passive:true});
   card.addEventListener('touchmove', ()=>{ touchMoved=true; clearTimeout(pressTimer); }, {passive:true});
   card.addEventListener('touchcancel', ()=>{ clearTimeout(pressTimer); longPressed=false; }, {passive:true});
@@ -1060,6 +1120,50 @@ function applyExcelData() {
 }
 
 // ============================================================
+//  編集モード管理
+// ============================================================
+function openPwModal() {
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  document.getElementById('pwOverlay').classList.add('on');
+  setTimeout(()=>document.getElementById('pwInput').focus(), 80);
+}
+function closePwModal() {
+  document.getElementById('pwOverlay').classList.remove('on');
+}
+function submitPassword() {
+  const val = document.getElementById('pwInput').value.trim();
+  if (val === '0280') {
+    isEditMode = true;
+    document.body.classList.add('edit-mode');
+    document.getElementById('btnEditMode').textContent = '🔓 編集中';
+    document.getElementById('btnEditMode').classList.add('active');
+    // 既存カードを編集モード対応で再描画
+    Object.keys(cardData).forEach(id => refreshCard(id));
+    closePwModal();
+  } else {
+    const errEl = document.getElementById('pwError');
+    errEl.textContent = 'パスワードが違います';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+    setTimeout(()=>{ errEl.textContent=''; }, 2000);
+  }
+}
+function toggleEditMode() {
+  if (isEditMode) {
+    // 編集モード解除
+    isEditMode = false;
+    document.body.classList.remove('edit-mode');
+    document.getElementById('btnEditMode').textContent = '🔒 編集モード';
+    document.getElementById('btnEditMode').classList.remove('active');
+    // カードを通常モードで再描画
+    Object.keys(cardData).forEach(id => refreshCard(id));
+  } else {
+    openPwModal();
+  }
+}
+
+// ============================================================
 //  印刷
 // ============================================================
 function printCurrentDate() {
@@ -1093,6 +1197,21 @@ function setupEvents() {
     el.addEventListener('click',fn);
     el.addEventListener('touchend',(e)=>{e.preventDefault();fn();});
   };
+
+  // 編集モードボタン
+  reg('btnEditMode', toggleEditMode);
+
+  // パスワードモーダル
+  reg('pwCancel', closePwModal);
+  reg('pwOk',     submitPassword);
+  document.getElementById('pwInput').addEventListener('keydown', e=>{
+    if (e.key==='Enter') submitPassword();
+    if (e.key==='Escape') closePwModal();
+  });
+  document.getElementById('pwOverlay').addEventListener('click', e=>{
+    if (e.target===document.getElementById('pwOverlay')) closePwModal();
+  });
+
   reg('cardCancel', closeModal);
   reg('cardSave',   saveModal);
 
