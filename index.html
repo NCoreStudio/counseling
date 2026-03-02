@@ -126,7 +126,7 @@ body.edit-mode .tab.on .tab-pen { display: inline-block !important; }
   .sec { display: none !important; }
   .sec.print-target { display: block !important; }
   table.grid { border-spacing: 2px !important; width: 100% !important; table-layout: fixed !important; }
-  .th-corner { min-width: 40px !important; width: 40px !important; }
+  .th-corner { min-width: 40px !important; width: 40px !important; position: static !important; }
   .th-time {
     min-width: 0 !important; width: auto !important; height: 28px !important;
     background: #1e3a5f !important; color: #fff !important;
@@ -137,8 +137,10 @@ body.edit-mode .tab.on .tab-pen { display: inline-block !important; }
     min-width: 40px !important; width: 40px !important; height: auto !important;
     background: #1e3a5f !important; color: #fff !important;
     font-size: .6rem !important; padding: 2px !important;
+    position: static !important;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
+  .th-row::after { display: none !important; }
   .td { min-width: 0 !important; width: auto !important; height: 54px !important; }
   .card {
     min-height: 54px !important; border-width: 1px !important;
@@ -202,7 +204,13 @@ body.edit-mode .tab.on .tab-pen { display: inline-block !important; }
 
 /* ─── TABLE ─── */
 table.grid { border-collapse: separate; border-spacing: 4px; }
-.th-corner { min-width: 52px; width: 52px; }
+
+/* 左上コーナー固定 */
+.th-corner {
+  min-width: 52px; width: 52px;
+  position: sticky; left: 0; z-index: 3;
+  background: #0f172a;
+}
 
 .th-time {
   min-width: var(--cw); width: var(--cw); height: 42px;
@@ -212,13 +220,23 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
   border-radius: 6px; white-space: nowrap; padding: 3px;
   position: relative;
 }
+
+/* 講師名列を左固定 */
 .th-row {
   min-width: 52px; width: 52px; height: var(--ch);
   background: #1e3a5f; color: #93c5fd;
   font-size: .75rem; font-weight: 700;
   text-align: center; vertical-align: middle;
   border-radius: 6px; word-break: keep-all; padding: 4px 2px;
-  position: relative;
+  position: sticky; left: 0; z-index: 2;
+}
+/* スクロール時に背景が透けないよう影をつける */
+.th-row::after {
+  content: '';
+  position: absolute; top: 0; right: -6px;
+  width: 6px; height: 100%;
+  background: linear-gradient(to right, rgba(15,23,42,.4), transparent);
+  pointer-events: none;
 }
 .hdr-pen {
   position: absolute; top: 2px; right: 2px;
