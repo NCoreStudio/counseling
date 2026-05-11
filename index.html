@@ -579,24 +579,24 @@ const DEFAULT_SLOTS = [
 let hdrData = {
   dates: [
     {
-      label: "3/2（月）",
+      label: "5/11（月）",
       slots: [...DEFAULT_SLOTS],
-      rows: [ {label:"戸祭"}, {label:"田中"}, {label:"小杉"}, {label:"（空）"} ]
+      rows: [ {label:"小杉"}, {label:"戸祭"}, {label:"加藤"}, {label:"（空）"} ]
     },
     {
-      label: "3/3（火）",
+      label: "5/12（火）",
       slots: [...DEFAULT_SLOTS],
       rows: [ {label:"田村"}, {label:"後藤"}, {label:"戸祭"}, {label:"（空）"} ]
     },
     {
-      label: "3/4（水）",
+      label: "5/13（水）",
       slots: [...DEFAULT_SLOTS],
       rows: [ {label:"戸祭"}, {label:"後藤"}, {label:"小杉"}, {label:"（空）"} ]
     },
     {
-      label: "3/5（木）",
+      label: "5/14（木）",
       slots: [...DEFAULT_SLOTS],
-      rows: [ {label:"田村"}, {label:"田中"}, {label:"後藤"}, {label:"戸祭"} ]
+      rows: [ {label:"田村"}, {label:"三溝"}, {label:"後藤"}, {label:"戸祭"} ]
     },
   ]
 };
@@ -605,107 +605,126 @@ let hdrData = {
 //  初期カードデータ
 // ============================================================
 const INITIAL_CARDS = {
-  // 3/2 row0
-  d0r0c0:{num:"308",name:"落合 夏実",staff:"長広"},
-  d0r0c1:{num:"327",name:"檜垣 初音",staff:"町田"},
-  d0r0c2:{num:"129",name:"乙野 圭史",staff:"長広"},
-  d0r0c3:{num:"152",name:"門野 美希",staff:"澤中"},
-  d0r0c4:{num:"234",name:"荒木 洸人",staff:"川﨑"},
-  d0r0c5:{num:"235",name:"篠木 愛海",staff:"川﨑"},
-  d0r0c6:{num:"232",name:"髙橋 奈緒",staff:"遠藤(洋)"},
-  d0r0c7:{num:"322",name:"兎澤 胡桃",staff:"奥田"},
-  // 3/2 row1
-  d0r1c0:{num:"312",name:"古木 美有",staff:"澤中"},
-  d0r1c1:{num:"302",name:"香月 元気",staff:"遠藤(真)"},
-  d0r1c2:{num:"113",name:"知名 定彦",staff:"長広"},
-  d0r1c3:{num:"161",name:"蓮 勇貴",staff:"長広"},
-  d0r1c4:{num:"246",name:"大髙 匠海",staff:"石田"},
-  d0r1c5:{num:"156",name:"田島 栞",staff:"石田"},
-  d0r1c6:{num:"230",name:"池澤 友真",staff:"堀口"},
-  d0r1c7:{num:"132",name:"和田 優希",staff:"長広"},
-  // 3/2 row2
-  d0r2c0:{num:"325",name:"下山 雅人",staff:"町田"},
-  d0r2c1:{num:"128",name:"佐藤 果澄",staff:"長広"},
-  d0r2c2:{num:"138",name:"岡嶋 翔太",staff:"長広"},
-  d0r2c3:{num:"127",name:"後藤 空也",staff:"長広"},
-  d0r2c4:{num:"242",name:"横尾 允徳",staff:"堀口"},
-  d0r2c5:{num:"139",name:"山川 夏輝",staff:"澤中"},
-  d0r2c6:{num:"201",name:"呉 昭彦",staff:"堀口"},
-  d0r2c7:{num:"133",name:"和田 勇人",staff:"長広"},
-  // 3/2 row3 → 空
-  // 3/3 row0
-  d1r0c0:{num:"410",name:"西崎 里美",staff:"奥田"},
-  d1r0c1:{num:"306",name:"村上 礼治",staff:"石田"},
-  d1r0c2:{num:"411",name:"吉川 千尋",staff:"長広"},
-  d1r0c3:{num:"318",name:"井口 豪",staff:"奥田"},
-  d1r0c4:{num:"104",name:"中島 ことな",staff:"遠藤(真)"},
-  d1r0c5:{num:"330",name:"佐藤 啓春",staff:"川﨑"},
-  d1r0c6:{num:"143",name:"真壁 智生",staff:"澤中"},
-  d1r0c7:{num:"147",name:"藤江 桜良",staff:"澤中"},
-  // 3/3 row1
+  // 5/11 row0 (小杉)
+  d0r0c0:{num:"410",name:"西崎 里美",staff:"奥田"},
+  d0r0c1:{num:"302",name:"香月 元気",staff:"遠藤(真)"},
+  d0r0c2:{num:"220",name:"銅木 彩人",staff:"奥田"},
+  d0r0c3:{num:"246",name:"大髙 匠海",staff:"石田"},
+  d0r0c4:{num:"250",name:"小森山 力翔",staff:"長広"},
+  d0r0c5:{num:"172",name:"中西 良志",staff:"石田"},
+  // d0r0c6 空
+  d0r0c7:{num:"164",name:"羽石 愛華",staff:"町田"},
+  // 5/11 row1 (戸祭)
+  d0r1c0:{num:"101",name:"呉 理恵",staff:"遠藤(真)"},
+  d0r1c1:{num:"335",name:"淺田 一哲",staff:"石田"},
+  d0r1c2:{num:"233",name:"小野 麻斗",staff:"川﨑"},
+  d0r1c3:{num:"160",name:"福永 蔵人",staff:"川﨑"},
+  d0r1c4:{num:"170",name:"中野 航希",staff:"奥田"},
+  d0r1c5:{num:"110",name:"五十嵐 美紗",staff:"遠藤(真)"},
+  d0r1c6:{num:"232",name:"髙橋 奈緒",staff:"遠藤(洋)"},
+  d0r1c7:{num:"167",name:"永幡 拓也",staff:"長広"},
+  // 5/11 row2 (加藤)
+  d0r2c0:{num:"305",name:"渡邊 萌生香",staff:"遠藤(真)"},
+  d0r2c1:{num:"248",name:"大塚 銀平",staff:"長広"},
+  d0r2c2:{num:"218",name:"山城 そよか",staff:"奥田"},
+  d0r2c3:{num:"113",name:"知名 定彦",staff:"長広"},
+  d0r2c4:{num:"118",name:"伊藤 朱里",staff:"長広"},
+  d0r2c5:{num:"169",name:"吉田 一輝",staff:"長広"},
+  d0r2c6:{num:"121",name:"関口 真衣",staff:"長広"},
+  d0r2c7:{num:"139",name:"山川 夏輝",staff:"木谷"},
+  // 5/11 row3 → 空
+  // 5/12 row0 (田村)
+  d1r0c0:{num:"306",name:"村上 礼治",staff:"石田"},
+  d1r0c1:{num:"327",name:"檜垣 初音",staff:"町田"},
+  d1r0c2:{num:"315",name:"岩本 祥馬",staff:"町田"},
+  d1r0c3:{num:"330",name:"佐藤 啓春",staff:"川﨑"},
+  d1r0c4:{num:"201",name:"呉 昭彦",staff:"堀口"},
+  d1r0c5:{num:"133",name:"和田 勇人",staff:"長広"},
+  d1r0c6:{num:"206",name:"清水 愛和",staff:"石田"},
+  d1r0c7:{num:"322",name:"兎澤 胡桃",staff:"奥田"},
+  // 5/12 row1 (後藤)
   d1r1c0:{num:"333",name:"辻 和也",staff:"遠藤(真)"},
-  d1r1c1:{num:"310",name:"李沢 達弥",staff:"澤中"},
-  d1r1c2:{num:"303",name:"小林 澪生",staff:"遠藤(真)"},
-  d1r1c3:{num:"162",name:"佐古 大樹",staff:"遠藤(真)"},
-  d1r1c4:{num:"229",name:"白倉 海翔",staff:"堀口"},
-  d1r1c5:{num:"238",name:"西田 龍生",staff:"遠藤(真)"},
-  d1r1c6:{num:"136",name:"小向井 紫帆",staff:"長広"},
-  d1r1c7:{num:"130",name:"河野辺 悠仁",staff:"長広"},
-  // 3/3 row2
-  d1r2c0:{num:"151",name:"土田 ののか",staff:"長広"},
-  d1r2c1:{num:"102",name:"石田 章人",staff:"遠藤(真)"},
-  d1r2c2:{num:"313",name:"田中 瑞季",staff:"澤中"},
-  d1r2c3:{num:"118",name:"伊藤 朱里",staff:"長広"},
-  d1r2c4:{num:"206",name:"清水 愛和",staff:"石田"},
-  d1r2c5:{num:"241",name:"黒澤 一樹",staff:"遠藤(真)"},
-  d1r2c6:{num:"135",name:"池崎 夢菜",staff:"長広"},
-  // d1r2c7 空
-  // 3/3 row3 → 空
-  // 3/4 row0
-  d2r0c0:{num:"305",name:"渡邊 萌生香",staff:"遠藤(真)"},
-  d2r0c1:{num:"331",name:"石橋 美智子",staff:"川﨑"},
-  d2r0c2:{num:"316",name:"根岸 真子",staff:"澤中"},
-  d2r0c3:{num:"304",name:"佐藤 琢磨",staff:"遠藤(真)"},
-  d2r0c4:{num:"403",name:"初見 拓哉",staff:"木谷"},
-  d2r0c5:{num:"324",name:"那音 太",staff:"奥田"},
-  d2r0c6:{num:"203",name:"山田 周平",staff:"川﨑"},
-  d2r0c7:{num:"332",name:"渡邉 健太郎",staff:"石田"},
-  // 3/4 row1
-  d2r1c0:{num:"101",name:"呉 理恵",staff:"遠藤(真)"},
-  d2r1c1:{num:"204",name:"江草 紘明",staff:"遠藤(洋)"},
-  d2r1c2:{num:"404",name:"大村 英人",staff:"長広"},
-  d2r1c3:{num:"408",name:"松本 綾子",staff:"澤中"},
-  d2r1c6:{num:"110",name:"五十嵐 美紗",staff:"遠藤(真)"},
-  d2r1c7:{num:"320",name:"小川 千明",staff:"澤中"},
-  // 3/4 row2
-  d2r2c0:{num:"144",name:"藤村 知紀",staff:"澤中"},
-  d2r2c1:{num:"406",name:"井浦 克裕",staff:"長広"},
-  d2r2c2:{num:"119",name:"粟原 将仁",staff:"長広"},
-  d2r2c3:{num:"328",name:"久恒 友海",staff:"堀口"},
-  d2r2c6:{num:"323",name:"大森 聡",staff:"奥田"},
-  d2r2c7:{num:"315",name:"岩本 祥馬",staff:"澤中"},
-  // 3/4 row3 → 空
-  // 3/5 row0
-  d3r0c0:{num:"401",name:"中西 洋平",staff:"遠藤(真)"},
-  d3r0c1:{num:"107",name:"劉 玲男",staff:"遠藤(真)"},
-  d3r0c2:{num:"407",name:"柳橋 茉弥",staff:"長広"},
-  d3r0c3:{num:"405",name:"内藤 大生",staff:"長広"},
-  d3r0c4:{num:"220",name:"銅木 彩人",staff:"奥田"},
-  // 3/5 row1
-  d3r1c0:{num:"202",name:"岩本 健太郎",staff:"堀口"},
-  d3r1c1:{num:"149",name:"鈴木 理久",staff:"澤中"},
+  d1r1c1:{num:"325",name:"下山 雅人",staff:"町田"},
+  d1r1c2:{num:"318",name:"井口 豪",staff:"奥田"},
+  d1r1c3:{num:"230",name:"池澤 友真",staff:"堀口"},
+  d1r1c4:{num:"242",name:"横尾 允徳",staff:"堀口"},
+  d1r1c5:{num:"132",name:"和田 優希",staff:"長広"},
+  d1r1c6:{num:"173",name:"石川 琉生",staff:"石田"},
+  d1r1c7:{num:"203",name:"山田 周平",staff:"川﨑"},
+  // 5/12 row2 (戸祭)
+  d1r2c0:{num:"310",name:"李沢 達弥",staff:"木谷"},
+  d1r2c1:{num:"316",name:"根岸 真子",staff:"木谷"},
+  d1r2c2:{num:"303",name:"小林 澪生",staff:"遠藤(真)"},
+  d1r2c3:{num:"102",name:"石田 章人",staff:"遠藤(真)"},
+  d1r2c4:{num:"162",name:"佐古 大樹",staff:"遠藤(真)"},
+  d1r2c5:{num:"144",name:"藤村 知紀",staff:"町田"},
+  d1r2c6:{num:"146",name:"石鍋 裕也",staff:"遠藤(真)"},
+  d1r2c7:{num:"251",name:"菊地 萌ノ遥",staff:"石田"},
+  // 5/12 row3 → 空
+  // 5/13 row0 (戸祭)
+  d2r0c0:{num:"401",name:"中西 洋平",staff:"遠藤(真)"},
+  d2r0c1:{num:"313",name:"田中 瑞季",staff:"長広"},
+  d2r0c2:{num:"334",name:"堀田 三葉",staff:"奥田"},
+  d2r0c3:{num:"317",name:"川原 裕也",staff:"石田"},
+  d2r0c4:{num:"143",name:"真壁 智生",staff:"奥田"},
+  d2r0c5:{num:"130",name:"河野辺 悠仁",staff:"長広"},
+  d2r0c6:{num:"",name:"松田 晃大",staff:""},
+  d2r0c7:{num:"241",name:"黒澤 一樹",staff:"遠藤(真)"},
+  // 5/13 row1 (後藤)
+  d2r1c0:{num:"406",name:"井浦 克裕",staff:"長広"},
+  d2r1c1:{num:"409",name:"赤塚 奈保",staff:"奥田"},
+  d2r1c2:{num:"332",name:"渡邉 健太郎",staff:"石田"},
+  // d2r1c3 空
+  d2r1c4:{num:"147",name:"藤江 桜良",staff:"奥田"},
+  // d2r1c5 空
+  // d2r1c6 空
+  d2r1c7:{num:"163",name:"大森 聡",staff:"奥田"},
+  // 5/13 row2 (小杉)
+  d2r2c0:{num:"414",name:"溝呂木 優",staff:"遠藤(真)"},
+  d2r2c1:{num:"404",name:"大村 英人",staff:"長広"},
+  d2r2c2:{num:"204",name:"江草 紘明",staff:"遠藤(洋)"},
+  d2r2c3:{num:"135",name:"池崎 夢菜",staff:"長広"},
+  d2r2c4:{num:"408",name:"松本 綾子",staff:"堀口"},
+  // d2r2c5 空
+  // d2r2c6 空
+  d2r2c7:{num:"156",name:"田島 栞",staff:"石田"},
+  // 5/13 row3 → 空
+  // 5/14 row0 (田村)
+  d3r0c0:{num:"209",name:"伊藤 哲平",staff:"石田"},
+  d3r0c1:{num:"247",name:"本吉 那帆",staff:"長広"},
+  d3r0c2:{num:"331",name:"石橋 美智子",staff:"川﨑"},
+  d3r0c3:{num:"153",name:"加藤 龍也",staff:"遠藤(真)"},
+  d3r0c4:{num:"240",name:"横塚 真帆",staff:"川﨑"},
+  d3r0c5:{num:"225",name:"吉田 真紀",staff:"奥田"},
+  d3r0c6:{num:"116",name:"相曽 友里花",staff:"長広"},
+  d3r0c7:{num:"320",name:"小川 千明",staff:"澤中"},
+  // 5/14 row1 (三溝)
+  d3r1c0:{num:"229",name:"白倉 海翔",staff:"堀口"},
+  d3r1c1:{num:"128",name:"佐藤 果澄",staff:"長広"},
   d3r1c2:{num:"205",name:"保科 孝好",staff:"石田"},
-  d3r1c4:{num:"218",name:"山城 そよか",staff:"奥田"},
-  d3r1c7:{num:"121",name:"関口 真衣",staff:"長広"},
-  // 3/5 row2
-  d3r2c0:{num:"209",name:"伊藤 哲平",staff:"石田"},
-  d3r2c1:{num:"159",name:"建内 香子",staff:"堀口"},
-  d3r2c2:{num:"116",name:"相曽 友里花",staff:"長広"},
-  d3r2c7:{num:"117",name:"中尾 明日美",staff:"長広"},
-  // 3/5 row3
-  d3r3c0:{num:"226",name:"吉田 嵩",staff:"川﨑"},
-  d3r3c1:{num:"225",name:"吉田 真紀",staff:"奥田"},
-  d3r3c7:{num:"301",name:"溝呂木 優",staff:"遠藤(真)"},
+  d3r1c3:{num:"151",name:"土田 ののか",staff:"長広"},
+  d3r1c4:{num:"119",name:"粟原 将仁",staff:"長広"},
+  // d3r1c5 空
+  // d3r1c6 空
+  d3r1c7:{num:"136",name:"小向井 紫帆",staff:"長広"},
+  // 5/14 row2 (後藤)
+  d3r2c0:{num:"226",name:"吉田 嵩",staff:"川﨑"},
+  d3r2c1:{num:"138",name:"岡嶋 翔太",staff:"長広"},
+  d3r2c2:{num:"129",name:"乙野 圭史",staff:"長広"},
+  d3r2c3:{num:"127",name:"後藤 空也",staff:"長広"},
+  // d3r2c4 空
+  // d3r2c5 空
+  // d3r2c6 空
+  d3r2c7:{num:"123",name:"糸久 政喜",staff:"長広"},
+  // 5/14 row3 (戸祭)
+  d3r3c0:{num:"245",name:"中西 広香",staff:"奥田"},
+  d3r3c1:{num:"159",name:"建内 香子",staff:"堀口"},
+  d3r3c2:{num:"149",name:"鈴木 理久",staff:"堀口"},
+  // d3r3c3 空
+  // d3r3c4 空
+  // d3r3c5 空
+  // d3r3c6 空
+  d3r3c7:{num:"117",name:"中尾 明日美",staff:"長広"},
 };
 
 // ============================================================
