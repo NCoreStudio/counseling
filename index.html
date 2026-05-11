@@ -541,7 +541,7 @@ table.grid { border-collapse: separate; border-spacing: 4px; }
 // ============================================================
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, update, set }
+import { getDatabase, ref, onValue, update, set, get }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
@@ -1370,6 +1370,25 @@ function setConnected(ok) {
 
 // フォールバック
 setTimeout(()=>{ if(!fbInitialized){ fbInitialized=true; buildAll(); setupEvents(); } },3000);
+
+// Safari対策: フォアグラウンド復帰時 + 30秒ごとに強制再同期
+function forceResync() {
+  if (!fbInitialized) return;
+  get(dbRef).then(snap=>{
+    const remote = snap.val()||{};
+    Object.keys(remote).forEach(id=>{
+      if (states[id]===undefined) return;
+      if (states[id] !== remote[id]) {
+        states[id] = remote[id];
+        const el = document.querySelector(`.card[data-id="${id}"]`);
+        if (el) el.dataset.s = remote[id];
+      }
+    });
+    updateStats();
+  }).catch(()=>{});
+}
+document.addEventListener('visibilitychange', ()=>{ if (!document.hidden) forceResync(); });
+setInterval(forceResync, 30000);
 </script>
 </body>
 </html>
